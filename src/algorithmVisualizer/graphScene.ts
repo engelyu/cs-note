@@ -70,6 +70,10 @@ function nodeId(value: string | number): string {
   return String(value);
 }
 
+function nodeLabel(node: AlgorithmVisualizerGraphState["nodes"][number]): string {
+  return node.weight === null || node.weight === undefined ? nodeId(node.id) : String(node.weight);
+}
+
 function nodeKey(value: string | number): string {
   return `node:${nodeId(value)}`;
 }
@@ -91,11 +95,12 @@ export function projectAlgorithmVisualizerSelection(
 
   const node = state.nodes.find((candidate) => nodeKey(candidate.id) === elementId);
   if (node) {
+    const color = node.color ? `${node.color} · ` : "";
     return {
       elementId,
       kind: "node",
-      label: nodeId(node.id),
-      detail: `visited ${node.visitedCount} · selected ${node.selectedCount}`,
+      label: nodeLabel(node),
+      detail: `${color}visited ${node.visitedCount} · selected ${node.selectedCount}`,
     };
   }
 
@@ -165,7 +170,9 @@ export function createAlgorithmVisualizerGraphSkeletons(
     const rect = layoutForNode(state, layout, node.id);
     const selected = node.selectedCount > 0;
     const visited = node.visitedCount > 0;
-    const badge = selected ? "focus" : visited ? `visited ×${node.visitedCount}` : "idle";
+    const badge = selected ? "focus" : visited ? `visited ×${node.visitedCount}` : node.color ?? "idle";
+    const semanticBackground = node.color === "red" ? "#762b39" : node.color === "black" ? "#0d1117" : visited ? "#193451" : "#20232b";
+    const semanticStroke = node.color === "red" ? "#ff8290" : node.color === "black" ? "#d1d9e6" : visited ? "#63a7ff" : "#7f8ea3";
     skeletons.push({
       type: "ellipse",
       id: nodeKey(node.id),
@@ -173,11 +180,11 @@ export function createAlgorithmVisualizerGraphSkeletons(
       y: rect.y,
       width: rect.width,
       height: rect.height,
-      backgroundColor: selected ? "#493714" : visited ? "#193451" : "#20232b",
-      strokeColor: selected ? "#f2b84b" : visited ? "#63a7ff" : "#7f8ea3",
+      backgroundColor: semanticBackground,
+      strokeColor: selected ? "#f2b84b" : semanticStroke,
       strokeWidth: selected ? 4 : visited ? 3 : 2,
-      label: { text: `${nodeId(node.id)}\n${badge}`, fontSize: 16 },
-      customData: { componentType: "algorithm-visualizer-node", componentId: nodeKey(node.id), role: "vertex", label: nodeId(node.id) },
+      label: { text: `${nodeLabel(node)}\n${badge}`, fontSize: 16 },
+      customData: { componentType: "algorithm-visualizer-node", componentId: nodeKey(node.id), role: "vertex", label: nodeLabel(node), color: node.color },
     });
   }
   return skeletons;

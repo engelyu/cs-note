@@ -6,6 +6,7 @@ import {
   splitAlgorithmVisualizerFrames,
 } from "../src/algorithmVisualizer/trace.ts";
 import { algorithmVisualizerDfs } from "../src/algorithmVisualizer/dfsRuntime.ts";
+import { algorithmVisualizerRedBlackTree } from "../src/algorithmVisualizer/redBlackTreeRuntime.ts";
 import {
   createAlgorithmVisualizerGraphSkeletons,
   captureAlgorithmVisualizerGraphLayout,
@@ -128,4 +129,37 @@ test("Excalidraw selection resolves to the current logical graph object", () => 
   });
   assert.equal(projectAlgorithmVisualizerSelection(graph, { "node:missing": true }), null);
   assert.equal(projectAlgorithmVisualizerSelection(graph, {}), null);
+});
+
+test("Red-Black Tree artifact replays rotations, colors, and stable tree identities", () => {
+  assert.equal(algorithmVisualizerRedBlackTree.frames.length, 14);
+
+  const frames = algorithmVisualizerRedBlackTree.frames;
+  assert.equal(frames[1].graph?.nodes.find((node) => node.id === 10)?.color, "black");
+  assert.equal(frames[5].graph?.edges.some((edge) => edge.source === 20 && edge.target === 10), true);
+  assert.equal(frames[9].graph?.nodes.find((node) => node.id === 27)?.selectedCount, 1);
+
+  const finalGraph = frames.at(-1)?.graph;
+  assert.ok(finalGraph);
+  assert.deepEqual(
+    finalGraph.nodes.map((node) => [node.id, node.color]),
+    [[10, "black"], [20, "black"], [30, "red"], [15, "red"], [25, "red"], [27, "black"], [5, "red"]],
+  );
+  assert.deepEqual(
+    finalGraph.edges.map((edge) => [edge.source, edge.target]),
+    [[20, 10], [10, 15], [27, 25], [20, 27], [27, 30], [10, 5]],
+  );
+
+  const selected = projectAlgorithmVisualizerSelection(frames[9].graph, { "node:27": true });
+  assert.deepEqual(selected, {
+    elementId: "node:27",
+    kind: "node",
+    label: "27",
+    detail: "red · visited 0 · selected 1",
+  });
+
+  const redNode = createAlgorithmVisualizerGraphSkeletons(finalGraph, {})
+    .find((element) => element.id === "node:30");
+  assert.equal(redNode.backgroundColor, "#762b39");
+  assert.equal(redNode.customData.color, "red");
 });

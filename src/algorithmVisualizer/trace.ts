@@ -15,6 +15,7 @@ export type AlgorithmVisualizerFrame = {
 export type AlgorithmVisualizerGraphNode = {
   id: string | number;
   weight: unknown;
+  color: "red" | "black" | null;
   x: number;
   y: number;
   visitedCount: number;
@@ -65,6 +66,12 @@ function optionalNumber(value: unknown, fallback: number): number {
 
 function optionalCount(value: unknown): number {
   return Number.isInteger(value) && typeof value === "number" ? value : 0;
+}
+
+function nodeColor(value: unknown): "red" | "black" | null {
+  if (value === null || value === undefined) return null;
+  if (value !== "red" && value !== "black") throw new Error("GraphTracer node color must be red, black, or null");
+  return value;
 }
 
 function createGraph(title: string): AlgorithmVisualizerGraphState {
@@ -183,7 +190,7 @@ function applyGraphCommand(graph: AlgorithmVisualizerGraphState, method: string,
   if (method === "set") {
     const matrix = args[0];
     if (!Array.isArray(matrix)) throw new Error("GraphTracer set expects an adjacency matrix");
-    graph.nodes = matrix.map((_, id) => ({ id, weight: null, x: 0, y: 0, visitedCount: 0, selectedCount: 0 }));
+    graph.nodes = matrix.map((_, id) => ({ id, weight: null, color: null, x: 0, y: 0, visitedCount: 0, selectedCount: 0 }));
     graph.edges = [];
     for (let source = 0; source < matrix.length; source += 1) {
       const row = matrix[source];
@@ -200,6 +207,7 @@ function applyGraphCommand(graph: AlgorithmVisualizerGraphState, method: string,
     graph.nodes.push({
       id,
       weight: args[1] ?? null,
+      color: null,
       x: optionalNumber(args[2], 0),
       y: optionalNumber(args[3], 0),
       visitedCount: optionalCount(args[4]),
@@ -215,6 +223,12 @@ function applyGraphCommand(graph: AlgorithmVisualizerGraphState, method: string,
     if (args[3] !== undefined) node.y = optionalNumber(args[3], node.y);
     if (args[4] !== undefined) node.visitedCount = optionalCount(args[4]);
     if (args[5] !== undefined) node.selectedCount = optionalCount(args[5]);
+    return;
+  }
+  if (method === "setNodeColor") {
+    const node = findNode(graph, requireNodeId(args[0], "GraphTracer node id"));
+    if (!node) throw new Error("GraphTracer setNodeColor target does not exist");
+    node.color = nodeColor(args[1]);
     return;
   }
   if (method === "removeNode") {
