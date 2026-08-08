@@ -22,13 +22,33 @@ _Avoid_: Canvas, demo, widget
 A replayable run of an algorithm with a cursor, ordered events, semantic state, and focus targets.
 _Avoid_: Animation, recording, screen capture
 
+**Observation Plan**:
+The source-anchored authoring definition of which Record Points create frames and which explicit values are captured at each stop.
+_Avoid_: Semantic Model, scope scan, debugger transcript
+
+**Record Point**:
+A source anchor such as a line, function entry, or specific return site that creates one Observation Frame each time execution reaches it; a point that is never reached produces no frame.
+_Avoid_: Required frame, scope watcher, semantic event
+
+**Observation Frame**:
+An ordered snapshot produced when a Record Point is hit, containing its source anchor, selected evidence, and optional execution context.
+_Avoid_: Call-stack frame, screenshot, final semantic state
+
 **Execution Frame**:
 A semantic snapshot at one position in an Execution Session, paired with the event that explains how the session reached it.
-_Avoid_: Screenshot, canvas state
+_Avoid_: Observation Frame, call-stack frame, screenshot
 
 **Semantic Model**:
-The algorithm-specific entities, relations, values, and facts that explain an Execution Session; it is the source of truth for every view.
+The algorithm-specific mapping from named Observation Frame inputs to entities, relations, values, and facts that explain an Execution Session; it is the source of truth for every view and does not define source stop points.
 _Avoid_: Excalidraw scene, DOM state
+
+**Logical Component**:
+A stable semantic entity or collection, such as a graph node, edge, stack, or table row, that a Semantic Model updates across Execution Frames and views project into their own presentation formats.
+_Avoid_: Excalidraw element, DOM node, canvas object
+
+**Semantic Input Contract**:
+The named values and context fields a Semantic Model is allowed to read from each Observation Frame when producing logical state.
+_Avoid_: C++ scope, debugger API, view props
 
 **Teaching Concept**:
 A named idea the lesson wants the learner to understand, such as low-link propagation, on-stack membership, or an SCC root.
