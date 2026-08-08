@@ -1,5 +1,5 @@
 import type { LayoutRect } from "../core/types";
-import type { TarjanState } from "./tarjan";
+import type { TarjanState } from "./tarjanModel";
 
 type Point = { x: number; y: number };
 
@@ -9,7 +9,72 @@ export type CanvasElementSnapshot = {
   y?: number;
   width?: number;
   height?: number;
+  type?: string;
+  points?: unknown;
+  start?: unknown;
+  end?: unknown;
+  startArrowhead?: unknown;
+  endArrowhead?: unknown;
+  strokeColor?: string;
+  backgroundColor?: string;
+  fillStyle?: string;
+  strokeWidth?: number;
+  strokeStyle?: string;
+  roughness?: number;
+  opacity?: number;
+  roundness?: unknown;
+  label?: unknown;
+  fontSize?: number;
+  customData?: unknown;
 };
+
+const SHARED_SCENE_FIELDS = [
+  "id",
+  "type",
+  "strokeColor",
+  "backgroundColor",
+  "fillStyle",
+  "strokeWidth",
+  "strokeStyle",
+  "roughness",
+  "opacity",
+  "roundness",
+  "label",
+  "fontSize",
+  "customData",
+] as const;
+
+const EDGE_SCENE_FIELDS = [
+  ...SHARED_SCENE_FIELDS,
+  "x",
+  "y",
+  "width",
+  "height",
+  "points",
+  "start",
+  "end",
+  "startArrowhead",
+  "endArrowhead",
+] as const;
+
+function sceneSignature(element: CanvasElementSnapshot, fields: readonly string[]): string {
+  return JSON.stringify(Object.fromEntries(fields.map((field) => [field, element[field as keyof CanvasElementSnapshot]])));
+}
+
+export function isTarjanSceneSafe(
+  nextElements: readonly CanvasElementSnapshot[],
+  canonicalElements: readonly CanvasElementSnapshot[],
+): boolean {
+  if (nextElements.length !== canonicalElements.length) return false;
+
+  const nextById = new Map(nextElements.map((element) => [element.id, element]));
+  return canonicalElements.every((canonical) => {
+    const next = nextById.get(canonical.id);
+    if (!next) return false;
+    const fields = canonical.id?.startsWith("node:") ? SHARED_SCENE_FIELDS : EDGE_SCENE_FIELDS;
+    return sceneSignature(next, fields) === sceneSignature(canonical, fields);
+  });
+}
 
 export function captureTarjanLayout(
   elements: readonly CanvasElementSnapshot[],
@@ -61,7 +126,7 @@ export function createTarjanSkeletons(
     const end = boundary(to, layout[`node:${toLabel}`].width / 2, from);
     const active = state.activeEdge?.from === edge.from && state.activeEdge?.to === edge.to;
     const phase = state.activeEdge?.from === edge.from && state.activeEdge?.to === edge.to
-      ? state.line
+      ? state.phase
       : "plain";
     skeletons.push({
       type: "arrow",

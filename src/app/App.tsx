@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { convertToExcalidrawElements, Excalidraw } from "../excalidraw";
 import type { LayoutRect } from "../core/types";
-import { captureTarjanLayout, createTarjanSkeletons } from "../visualizations/tarjanScene";
-import { TARJAN_LAYOUT, tarjanPackage, type TarjanState } from "../visualizations/tarjan";
+import { captureTarjanLayout, createTarjanSkeletons, isTarjanSceneSafe } from "../visualizations/tarjanScene";
+import { TARJAN_LAYOUT } from "../visualizations/tarjanLayout";
+import { tarjanPackage } from "../visualizations/tarjanRuntime";
+import type { TarjanState } from "../visualizations/tarjanModel";
 import {
   projectTarjanCallStack,
   projectTarjanConcepts,
+  projectTarjanConceptLabel,
   projectTarjanTimeline,
   projectTarjanVariables,
 } from "../visualizations/tarjanProjections";
@@ -18,17 +21,39 @@ type ExcalidrawElement = {
   y?: number;
   width?: number;
   height?: number;
+  type?: string;
+  points?: unknown;
+  start?: unknown;
+  end?: unknown;
+  startArrowhead?: unknown;
+  endArrowhead?: unknown;
+  strokeColor?: string;
+  backgroundColor?: string;
+  fillStyle?: string;
+  strokeWidth?: number;
+  strokeStyle?: string;
+  roughness?: number;
+  opacity?: number;
+  roundness?: unknown;
+  label?: unknown;
+  fontSize?: number;
+  customData?: unknown;
 };
 
 type ExcalidrawApi = {
   updateScene: (scene: { elements: unknown[] }) => void;
 };
 
-const frames = tarjanPackage.scenarios[0].frames;
+const scenario = tarjanPackage.scenarios[0];
+const frames = scenario.frames;
+const panelIds = tarjanPackage.views
+  .filter((view) => view.kind === "panel")
+  .map((view) => view.id)
+  .filter((id): id is PanelId => ["variables", "call-stack", "concepts", "timeline"].includes(id));
 
 export function App() {
   const [step, setStep] = useState(0);
-  const [panel, setPanel] = useState<PanelId>("variables");
+  const [panel, setPanel] = useState<PanelId>(panelIds[0] ?? "variables");
   const [inspectorVisible, setInspectorVisible] = useState(true);
   const [layout, setLayout] = useState<Record<string, LayoutRect>>(() => ({ ...TARJAN_LAYOUT }));
   const apiRef = useRef<ExcalidrawApi | null>(null);
@@ -61,7 +86,16 @@ export function App() {
       return before.x !== after.x || before.y !== after.y || before.width !== after.width || before.height !== after.height;
     });
     if (changed) setLayout(nextLayout);
+
+    const canonicalElements = convertToExcalidrawElements(createTarjanSkeletons(frame.state, nextLayout));
+    if (!isTarjanSceneSafe(nextElements as ExcalidrawElement[], canonicalElements as ExcalidrawElement[])) {
+      applyingSceneRef.current = true;
+      apiRef.current?.updateScene({ elements: canonicalElements });
+      window.setTimeout(() => { applyingSceneRef.current = false; }, 0);
+    }
   };
+
+  const componentSummary = frame.state.components.map((component) => `{${component.map((member) => frame.state.labels[member]).join(", ")}}`).join(" · ") || "—";
 
   return (
     <div className="cs-app">
@@ -85,7 +119,7 @@ export function App() {
           <p className="sidebar-subtitle">Guided algorithm traces</p>
           <button className="scenario-card active">
             <span className="scenario-index">01</span>
-            <span><strong>The simplest cycle</strong><small>Tarjan · 15 events</small></span>
+            <span><strong>{scenario.title}</strong><small>Tarjan · {frames.length} events</small></span>
             <i>›</i>
           </button>
           <div className="sidebar-divider" />
@@ -97,7 +131,7 @@ export function App() {
         <main className="editor-shell">
           <div className="editor-header">
             <div><span className="eyebrow">NOW DEBUGGING</span><h1>Tarjan's Strongly Connected Components</h1></div>
-            <div className="editor-actions"><button className="action-button">↗ <span>Open lesson</span></button><button className="action-button" onClick={() => setInspectorVisible((visible) => !visible)}>{inspectorVisible ? "Hide" : "Show"} panels</button></div>
+            <div className="editor-actions"><button className="action-button">↗ <span>Open lesson</span></button>{tarjanPackage.capabilities.toggleView && <button className="action-button" onClick={() => setInspectorVisible((visible) => !visible)}>{inspectorVisible ? "Hide" : "Show"} panels</button>}</div>
           </div>
 
           <section className="canvas-frame" aria-label="Algorithm canvas">
@@ -108,7 +142,7 @@ export function App() {
                 initialData={{ elements, appState: { viewBackgroundColor: "#17191f" } }}
                 theme="dark"
                 excalidrawAPI={(api: unknown) => { apiRef.current = api as ExcalidrawApi; }}
-                onChange={handleCanvasChange}
+                onChange={tarjanPackage.capabilities.editLayout ? handleCanvasChange : undefined}
                 UIOptions={{
                   canvasActions: {
                     changeViewBackgroundColor: false,
@@ -123,27 +157,27 @@ export function App() {
               />
             </div>
             <div className="canvas-legend"><span><i className="legend-swatch on-stack" />On stack</span><span><i className="legend-swatch component" />SCC</span><span><i className="legend-ring" />Current</span></div>
-            <div className="canvas-hint">Drag nodes to adjust the reading layout</div>
+            <div className="canvas-hint">Only node layout edits persist; graph and algorithm edits are restored</div>
           </section>
 
           <section className="explain-strip">
             <div className="step-number">{String(step + 1).padStart(2, "0")}</div>
             <div className="explain-copy"><span>{frame.event.phase.toUpperCase()}</span><strong>{frame.event.label}</strong><p>{frame.event.detail}</p></div>
-            <div className="concept-pill"><small>CONCEPT</small><b>{conceptLabel(frame.state)}</b></div>
+            <div className="concept-pill"><small>CONCEPT</small><b>{projectTarjanConceptLabel(frame.state)}</b></div>
           </section>
 
           <section className="transport-panel">
             <div className="transport-top"><span>EXECUTION TRACE</span><small>{step + 1} / {frames.length} events</small></div>
             <div className="transport-track"><div className="track-line"><i style={{ width: `${(step / Math.max(1, frames.length - 1)) * 100}%` }} /></div>{frames.map((candidate, index) => <button key={candidate.event.id} className={index <= step ? "done" : ""} onClick={() => changeStep(index)} aria-label={`Go to event ${index + 1}`} />)}</div>
-            <div className="transport-controls"><button onClick={() => changeStep(step - 1)} aria-label="Previous event">←</button><button className="play-button" onClick={() => changeStep(step === frames.length - 1 ? 0 : step + 1)} aria-label="Next event">{step === frames.length - 1 ? "↺" : "▶"}</button><button onClick={() => changeStep(step + 1)} aria-label="Next event">→</button><span className="key-hint"><kbd>←</kbd><kbd>→</kbd> STEP</span></div>
+            <div className="transport-controls"><button onClick={() => changeStep(step - 1)} aria-label="Previous event">←</button><button className="play-button" onClick={() => { if (step < frames.length - 1) changeStep(step + 1); }} disabled={step === frames.length - 1 && !tarjanPackage.capabilities.rerun} aria-label={step === frames.length - 1 ? "Trace complete" : "Next event"}>{step === frames.length - 1 ? "✓" : "▶"}</button><button onClick={() => changeStep(step + 1)} aria-label="Next event">→</button><span className="key-hint"><kbd>←</kbd><kbd>→</kbd> STEP</span></div>
           </section>
         </main>
 
-        {inspectorVisible && <aside className="secondary-sidebar">
-          <div className="panel-tabs">{(["variables", "call-stack", "concepts", "timeline"] as PanelId[]).map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div>
+        {(!tarjanPackage.capabilities.toggleView || inspectorVisible) && <aside className="secondary-sidebar">
+          <div className="panel-tabs">{panelIds.map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div>
           <div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "call-stack" ? `${frame.state.stack.length} frames` : panel === "concepts" ? "3 concepts" : `${frames.length} events`}</small></div>
           <div className="panel-body">{panel === "variables" ? <VariablesPanel frame={frame} /> : panel === "call-stack" ? <CallStackPanel frame={frame} /> : panel === "concepts" ? <ConceptsPanel frame={frame} /> : <TimelinePanel frameIndex={frame.index} onSelect={changeStep} />}</div>
-          <div className="watch-panel"><div className="panel-heading"><span>WATCH</span><small>semantic</small></div><div className="watch-row"><span>current</span><b>{frame.state.current == null ? "—" : frame.state.labels[frame.state.current]}</b></div><div className="watch-row"><span>components</span><b>{frame.state.components.length}</b></div><div className="watch-row"><span>line</span><b>{frame.state.line}</b></div></div>
+          <div className="watch-panel"><div className="panel-heading"><span>WATCH</span><small>semantic</small></div><div className="watch-row"><span>current</span><b>{frame.state.current == null ? "—" : frame.state.labels[frame.state.current]}</b></div><div className="watch-row"><span>components</span><b>{componentSummary}</b></div><div className="watch-row"><span>phase</span><b>{frame.state.phase}</b></div></div>
         </aside>}
       </div>
 
@@ -156,16 +190,9 @@ function panelLabel(id: PanelId): string {
   return id === "call-stack" ? "Call Stack" : id === "variables" ? "Variables" : id === "concepts" ? "Concepts" : "Timeline";
 }
 
-function conceptLabel(state: TarjanState): string {
-  if (state.line === "back-edge") return "low-link";
-  if (state.line === "pop-scc" || state.components.length > 0) return "SCC root";
-  if (state.stack.length > 0) return "onStack";
-  return "DFS";
-}
-
 function VariablesPanel({ frame }: { frame: typeof frames[number] }) {
   const rows = projectTarjanVariables(frame);
-  return <div className="variables-table"><div className="table-head"><span>NODE</span><span>DISC</span><span>LOW</span><span>STACK</span></div>{rows.map((row) => <div className={`variable-row ${row.focused ? "focused" : ""}`} key={row.label}><span><i className={`node-dot ${row.onStack ? "blue" : row.inComponent ? "green" : ""}`} />{row.label}</span><code>{row.disc ?? "—"}</code><code>{row.low ?? "—"}</code><b>{row.onStack ? "yes" : "no"}</b></div>)}</div>;
+  return <div className="variables-table"><div className="table-head"><span>NODE</span><span>DISC</span><span>LOW</span><span>STACK</span><span>SCC</span></div>{rows.map((row) => <div className={`variable-row ${row.focused ? "focused" : ""}`} key={row.label}><span><i className={`node-dot ${row.onStack ? "blue" : row.inComponent ? "green" : ""}`} />{row.label}</span><code>{row.disc ?? "—"}</code><code>{row.low ?? "—"}</code><b>{row.onStack ? "yes" : "no"}</b><small>{row.component ?? "—"}</small></div>)}</div>;
 }
 
 function CallStackPanel({ frame }: { frame: typeof frames[number] }) {

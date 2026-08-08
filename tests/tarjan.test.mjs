@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createTarjanFrames, tarjanPackage } from "../src/visualizations/tarjan.ts";
-import { captureTarjanLayout, createTarjanSkeletons } from "../src/visualizations/tarjanScene.ts";
+import { createTarjanFrames } from "../src/visualizations/tarjan.ts";
+import { tarjanPackage } from "../src/visualizations/tarjanRuntime.ts";
+import { captureTarjanLayout, createTarjanSkeletons, isTarjanSceneSafe } from "../src/visualizations/tarjanScene.ts";
 import {
   projectTarjanCallStack,
   projectTarjanConcepts,
@@ -20,6 +21,11 @@ test("Tarjan package exposes a replayable semantic scenario", () => {
   ]);
   assert.equal(tarjanPackage.scenarios.length, 1);
   assert.ok(tarjanPackage.scenarios[0].frames.length > 1);
+  assert.equal(tarjanPackage.capabilities.toggleView, true);
+  assert.equal(tarjanPackage.capabilities.editLayout, true);
+  assert.equal(tarjanPackage.capabilities.editInput, false);
+  assert.equal(tarjanPackage.capabilities.rerun, false);
+  assert.equal(tarjanPackage.scenarios[0].frames.length, createTarjanFrames().length);
 });
 
 test("Tarjan frames preserve the teaching concepts behind SCC detection", () => {
@@ -69,6 +75,29 @@ test("Graph Canvas layout edits stay separate from semantic state", () => {
   assert.equal(frame.state.edges.length, 5);
 });
 
+test("Graph Canvas restores semantic edits while preserving node layout edits", () => {
+  const frame = createTarjanFrames()[1];
+  const layout = {
+    "node:A": { x: 110, y: 90, width: 64, height: 64 },
+    "node:B": { x: 290, y: 90, width: 64, height: 64 },
+    "node:C": { x: 200, y: 250, width: 64, height: 64 },
+    "node:D": { x: 440, y: 90, width: 64, height: 64 },
+    "node:E": { x: 440, y: 250, width: 64, height: 64 },
+  };
+  const canonical = createTarjanSkeletons(frame.state, layout);
+  const movedNode = canonical.map((element) => element.id === "node:A"
+    ? { ...element, x: 180, y: 130, width: 96, height: 80 }
+    : element);
+  const recoloredNode = canonical.map((element) => element.id === "node:A"
+    ? { ...element, backgroundColor: "#ffffff" }
+    : element);
+  const addedElement = [...canonical, { id: "user-drawn-line", type: "line" }];
+
+  assert.equal(isTarjanSceneSafe(movedNode, canonical), true);
+  assert.equal(isTarjanSceneSafe(recoloredNode, canonical), false);
+  assert.equal(isTarjanSceneSafe(addedElement, canonical), false);
+});
+
 test("Debugger projections derive from the current semantic frame", () => {
   const frames = createTarjanFrames();
   const frame = frames.find((candidate) => candidate.event.phase === "back-edge");
@@ -81,6 +110,7 @@ test("Debugger projections derive from the current semantic frame", () => {
 
   assert.equal(variables.find((row) => row.label === "A")?.onStack, true);
   assert.equal(variables.find((row) => row.label === "C")?.focused, true);
+  assert.equal(projectTarjanVariables(frames.at(-1)).find((row) => row.label === "A")?.component, "A, B, C");
   assert.equal(callStack[0]?.label, "C");
   assert.equal(callStack[0]?.active, true);
   assert.equal(concepts.find((concept) => concept.id === "low-link")?.detail, "low[C] = 0");

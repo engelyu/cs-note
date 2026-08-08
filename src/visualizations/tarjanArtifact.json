@@ -1,0 +1,1926 @@
+{
+  "artifactVersion": 1,
+  "packageId": "tarjan-scc",
+  "scenarioId": "simple-cycle",
+  "frames": [
+    {
+      "index": 0,
+      "event": {
+        "id": "tarjan-0",
+        "phase": "init",
+        "label": "Start DFS",
+        "detail": "Tarjan finds strongly connected components with one depth-first search."
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "low": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "onStack": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "stack": [],
+        "components": [],
+        "current": null,
+        "activeEdge": null,
+        "phase": "init"
+      },
+      "changedIds": []
+    },
+    {
+      "index": 1,
+      "event": {
+        "id": "tarjan-1",
+        "phase": "visit",
+        "label": "Visit A",
+        "detail": "Set disc[A] = low[A] = 0, then push A onto the stack.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:A"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "stack": [
+          0
+        ],
+        "components": [],
+        "current": 0,
+        "activeEdge": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "node:A"
+      ]
+    },
+    {
+      "index": 2,
+      "event": {
+        "id": "tarjan-2",
+        "phase": "tree-edge",
+        "label": "A → B",
+        "detail": "B is unvisited, so this is a tree edge. Recurse into B.",
+        "focus": {
+          "kind": "entity",
+          "id": "edge:0-1"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "stack": [
+          0
+        ],
+        "components": [],
+        "current": 0,
+        "activeEdge": {
+          "from": 0,
+          "to": 1
+        },
+        "phase": "tree-edge"
+      },
+      "changedIds": [
+        "edge:0-1"
+      ]
+    },
+    {
+      "index": 3,
+      "event": {
+        "id": "tarjan-3",
+        "phase": "visit",
+        "label": "Visit B",
+        "detail": "Set disc[B] = low[B] = 1, then push B onto the stack.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:B"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          -1,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          1,
+          -1,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          false,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1
+        ],
+        "components": [],
+        "current": 1,
+        "activeEdge": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "node:B"
+      ]
+    },
+    {
+      "index": 4,
+      "event": {
+        "id": "tarjan-4",
+        "phase": "tree-edge",
+        "label": "B → C",
+        "detail": "C is unvisited, so this is a tree edge. Recurse into C.",
+        "focus": {
+          "kind": "entity",
+          "id": "edge:1-2"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          -1,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          1,
+          -1,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          false,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1
+        ],
+        "components": [],
+        "current": 1,
+        "activeEdge": {
+          "from": 1,
+          "to": 2
+        },
+        "phase": "tree-edge"
+      },
+      "changedIds": [
+        "edge:1-2"
+      ]
+    },
+    {
+      "index": 5,
+      "event": {
+        "id": "tarjan-5",
+        "phase": "visit",
+        "label": "Visit C",
+        "detail": "Set disc[C] = low[C] = 2, then push C onto the stack.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:C"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          1,
+          2,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [],
+        "current": 2,
+        "activeEdge": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "node:C"
+      ]
+    },
+    {
+      "index": 6,
+      "event": {
+        "id": "tarjan-6",
+        "phase": "back-edge",
+        "label": "Back edge C → A",
+        "detail": "A is still on the stack, so low[C] can use disc[A] = 0 instead of low[A].",
+        "focus": {
+          "kind": "entity",
+          "id": "edge:2-0"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          1,
+          0,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [],
+        "current": 2,
+        "activeEdge": {
+          "from": 2,
+          "to": 0
+        },
+        "phase": "back-edge"
+      },
+      "changedIds": [
+        "node:C"
+      ]
+    },
+    {
+      "index": 7,
+      "event": {
+        "id": "tarjan-7",
+        "phase": "wait",
+        "label": "Keep C on stack",
+        "detail": "low[C] = 0 is earlier than disc[C] = 2, so the outer call decides when it closes.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:C"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          1,
+          0,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [],
+        "current": 2,
+        "activeEdge": null,
+        "phase": "wait"
+      },
+      "changedIds": [
+        "node:C"
+      ]
+    },
+    {
+      "index": 8,
+      "event": {
+        "id": "tarjan-8",
+        "phase": "return",
+        "label": "Return to B",
+        "detail": "low[B] = min(1, low[C] = 0) = 0.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:B"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [],
+        "current": 2,
+        "activeEdge": null,
+        "phase": "return"
+      },
+      "changedIds": [
+        "node:B"
+      ]
+    },
+    {
+      "index": 9,
+      "event": {
+        "id": "tarjan-9",
+        "phase": "tree-edge",
+        "label": "B → D",
+        "detail": "D is unvisited, so this is a tree edge. Recurse into D.",
+        "focus": {
+          "kind": "entity",
+          "id": "edge:1-3"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          -1,
+          -1
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          -1,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [],
+        "current": 1,
+        "activeEdge": {
+          "from": 1,
+          "to": 3
+        },
+        "phase": "tree-edge"
+      },
+      "changedIds": [
+        "edge:1-3"
+      ]
+    },
+    {
+      "index": 10,
+      "event": {
+        "id": "tarjan-10",
+        "phase": "visit",
+        "label": "Visit D",
+        "detail": "Set disc[D] = low[D] = 3, then push D onto the stack.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:D"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          -1
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "components": [],
+        "current": 3,
+        "activeEdge": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "node:D"
+      ]
+    },
+    {
+      "index": 11,
+      "event": {
+        "id": "tarjan-11",
+        "phase": "tree-edge",
+        "label": "D → E",
+        "detail": "E is unvisited, so this is a tree edge. Recurse into E.",
+        "focus": {
+          "kind": "entity",
+          "id": "edge:3-4"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          -1
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          -1
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "components": [],
+        "current": 3,
+        "activeEdge": {
+          "from": 3,
+          "to": 4
+        },
+        "phase": "tree-edge"
+      },
+      "changedIds": [
+        "edge:3-4"
+      ]
+    },
+    {
+      "index": 12,
+      "event": {
+        "id": "tarjan-12",
+        "phase": "visit",
+        "label": "Visit E",
+        "detail": "Set disc[E] = low[E] = 4, then push E onto the stack.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:E"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "stack": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "components": [],
+        "current": 4,
+        "activeEdge": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "node:E"
+      ]
+    },
+    {
+      "index": 13,
+      "event": {
+        "id": "tarjan-13",
+        "phase": "root",
+        "label": "E closes an SCC",
+        "detail": "low[E] === disc[E] === 4, so E is an SCC root.",
+        "focus": {
+          "kind": "concept",
+          "id": "scc-root"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "stack": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "components": [],
+        "current": 4,
+        "activeEdge": null,
+        "phase": "root"
+      },
+      "changedIds": [
+        "node:E"
+      ]
+    },
+    {
+      "index": 14,
+      "event": {
+        "id": "tarjan-14",
+        "phase": "scc",
+        "label": "Found {E}",
+        "detail": "Pop the stack until E. This is strongly connected component #1.",
+        "focus": {
+          "kind": "concept",
+          "id": "scc"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "components": [
+          [
+            4
+          ]
+        ],
+        "current": 4,
+        "activeEdge": null,
+        "phase": "pop-scc"
+      },
+      "changedIds": [
+        "node:E"
+      ]
+    },
+    {
+      "index": 15,
+      "event": {
+        "id": "tarjan-15",
+        "phase": "return",
+        "label": "Return to D",
+        "detail": "low[D] = min(3, low[E] = 4) = 3.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:D"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "components": [
+          [
+            4
+          ]
+        ],
+        "current": 4,
+        "activeEdge": null,
+        "phase": "return"
+      },
+      "changedIds": [
+        "node:D"
+      ]
+    },
+    {
+      "index": 16,
+      "event": {
+        "id": "tarjan-16",
+        "phase": "root",
+        "label": "D closes an SCC",
+        "detail": "low[D] === disc[D] === 3, so D is an SCC root.",
+        "focus": {
+          "kind": "concept",
+          "id": "scc-root"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "components": [
+          [
+            4
+          ]
+        ],
+        "current": 3,
+        "activeEdge": null,
+        "phase": "root"
+      },
+      "changedIds": [
+        "node:D"
+      ]
+    },
+    {
+      "index": 17,
+      "event": {
+        "id": "tarjan-17",
+        "phase": "scc",
+        "label": "Found {D}",
+        "detail": "Pop the stack until D. This is strongly connected component #2.",
+        "focus": {
+          "kind": "concept",
+          "id": "scc"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [
+          [
+            4
+          ],
+          [
+            3
+          ]
+        ],
+        "current": 3,
+        "activeEdge": null,
+        "phase": "pop-scc"
+      },
+      "changedIds": [
+        "node:D"
+      ]
+    },
+    {
+      "index": 18,
+      "event": {
+        "id": "tarjan-18",
+        "phase": "return",
+        "label": "Return to B",
+        "detail": "low[B] = min(0, low[D] = 3) = 0.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:B"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [
+          [
+            4
+          ],
+          [
+            3
+          ]
+        ],
+        "current": 3,
+        "activeEdge": null,
+        "phase": "return"
+      },
+      "changedIds": [
+        "node:B"
+      ]
+    },
+    {
+      "index": 19,
+      "event": {
+        "id": "tarjan-19",
+        "phase": "wait",
+        "label": "Keep B on stack",
+        "detail": "low[B] = 0 is earlier than disc[B] = 1, so the outer call decides when it closes.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:B"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [
+          [
+            4
+          ],
+          [
+            3
+          ]
+        ],
+        "current": 1,
+        "activeEdge": null,
+        "phase": "wait"
+      },
+      "changedIds": [
+        "node:B"
+      ]
+    },
+    {
+      "index": 20,
+      "event": {
+        "id": "tarjan-20",
+        "phase": "return",
+        "label": "Return to A",
+        "detail": "low[A] = min(0, low[B] = 0) = 0.",
+        "focus": {
+          "kind": "entity",
+          "id": "node:A"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [
+          [
+            4
+          ],
+          [
+            3
+          ]
+        ],
+        "current": 1,
+        "activeEdge": null,
+        "phase": "return"
+      },
+      "changedIds": [
+        "node:A"
+      ]
+    },
+    {
+      "index": 21,
+      "event": {
+        "id": "tarjan-21",
+        "phase": "root",
+        "label": "A closes an SCC",
+        "detail": "low[A] === disc[A] === 0, so A is an SCC root.",
+        "focus": {
+          "kind": "concept",
+          "id": "scc-root"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "stack": [
+          0,
+          1,
+          2
+        ],
+        "components": [
+          [
+            4
+          ],
+          [
+            3
+          ]
+        ],
+        "current": 0,
+        "activeEdge": null,
+        "phase": "root"
+      },
+      "changedIds": [
+        "node:A"
+      ]
+    },
+    {
+      "index": 22,
+      "event": {
+        "id": "tarjan-22",
+        "phase": "scc",
+        "label": "Found {A, B, C}",
+        "detail": "Pop the stack until A. This is strongly connected component #3.",
+        "focus": {
+          "kind": "concept",
+          "id": "scc"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "stack": [],
+        "components": [
+          [
+            4
+          ],
+          [
+            3
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ],
+        "current": 0,
+        "activeEdge": null,
+        "phase": "pop-scc"
+      },
+      "changedIds": [
+        "node:A",
+        "node:B",
+        "node:C"
+      ]
+    },
+    {
+      "index": 23,
+      "event": {
+        "id": "tarjan-23",
+        "phase": "done",
+        "label": "Complete",
+        "detail": "Found 3 strongly connected components in O(V + E).",
+        "focus": {
+          "kind": "concept",
+          "id": "scc"
+        }
+      },
+      "state": {
+        "labels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1
+          },
+          {
+            "from": 1,
+            "to": 2
+          },
+          {
+            "from": 2,
+            "to": 0
+          },
+          {
+            "from": 1,
+            "to": 3
+          },
+          {
+            "from": 3,
+            "to": 4
+          }
+        ],
+        "disc": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "low": [
+          0,
+          0,
+          0,
+          3,
+          4
+        ],
+        "onStack": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "stack": [],
+        "components": [
+          [
+            4
+          ],
+          [
+            3
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ],
+        "current": null,
+        "activeEdge": null,
+        "phase": "done"
+      },
+      "changedIds": []
+    }
+  ]
+}

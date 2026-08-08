@@ -1,5 +1,5 @@
 import type { ExecutionFrame, FocusTarget } from "../core/types";
-import type { TarjanState } from "./tarjan";
+import type { TarjanState } from "./tarjanModel";
 
 type TarjanFrame = ExecutionFrame<TarjanState>;
 
@@ -9,6 +9,7 @@ export type TarjanVariableRow = {
   low: number | null;
   onStack: boolean;
   inComponent: boolean;
+  component: string | null;
   focused: boolean;
 };
 
@@ -45,8 +46,16 @@ export function projectTarjanVariables(frame: TarjanFrame): TarjanVariableRow[] 
     low: state.low[index] < 0 ? null : state.low[index],
     onStack: state.onStack[index],
     inComponent: state.components.some((component) => component.includes(index)),
+    component: state.components.find((component) => component.includes(index))?.map((member) => state.labels[member]).join(", ") ?? null,
     focused: state.current === index,
   }));
+}
+
+export function projectTarjanConceptLabel(state: TarjanState): string {
+  if (state.phase === "back-edge") return "low-link";
+  if (state.phase === "pop-scc" || state.components.length > 0) return "SCC root";
+  if (state.stack.length > 0) return "onStack";
+  return "DFS";
 }
 
 export function projectTarjanCallStack(frame: TarjanFrame): TarjanCallStackEntry[] {
@@ -69,21 +78,21 @@ export function projectTarjanConcepts(frame: TarjanFrame): TarjanConcept[] {
       id: "onStack",
       label: "onStack",
       detail: state.stack.length > 0 ? `${state.stack.length} vertices retained` : "empty",
-      active: state.line === "visit" || state.line === "back-edge" || state.line === "wait",
+      active: state.phase === "visit" || state.phase === "back-edge" || state.phase === "wait",
       focus: { kind: "concept", id: "onStack" },
     },
     {
       id: "low-link",
       label: "low-link",
       detail: currentLabel == null ? "waiting for a vertex" : `low[${currentLabel}] = ${currentLow}`,
-      active: state.line === "back-edge" || state.line === "return",
+      active: state.phase === "back-edge" || state.phase === "return",
       focus: { kind: "concept", id: "low-link" },
     },
     {
       id: "scc-root",
       label: "SCC root",
       detail: state.components.length > 0 ? `${state.components.length} component found` : "not closed yet",
-      active: state.line === "root" || state.line === "pop-scc",
+      active: state.phase === "root" || state.phase === "pop-scc",
       focus: { kind: "concept", id: "scc-root" },
     },
   ];

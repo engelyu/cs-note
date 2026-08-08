@@ -84,3 +84,7 @@ button:focus-visible { outline: 2px solid #79b8ff; outline-offset: 2px; }
 .concept-card.active { border-color: #456e64; background: #1d302b; }.timeline-list { display: flex; flex-direction: column; gap: 4px; max-height: 430px; overflow: auto; }.timeline-entry { display: flex; align-items: center; gap: 9px; width: 100%; padding: 8px 9px; border: 1px solid #303540; border-radius: 5px; background: #20232a; color: inherit; text-align: left; cursor: pointer; }.timeline-entry:hover, .timeline-entry.active { border-color: #456e64; background: #1d302b; }.timeline-index { color: #697486; font: 8px ui-monospace, monospace; }.timeline-entry > span:nth-child(2) { display: flex; flex: 1; flex-direction: column; gap: 4px; }.timeline-entry strong { overflow: hidden; color: #e2e6ed; font: 9px ui-monospace, monospace; text-overflow: ellipsis; white-space: nowrap; }.timeline-entry small { color: #7c8797; font-size: 8px; text-transform: uppercase; }
 
 @media (max-width: 1200px) { .workbench { grid-template-columns: 42px 210px minmax(520px, 1fr) 260px; }.titlebar { grid-template-columns: 200px 1fr 190px; }.editor-header h1 { font-size: 18px; } }
+
+.table-head, .variable-row { grid-template-columns: 1.25fr .55fr .55fr .65fr 1fr; }
+.variable-row small { overflow: hidden; color: #73b8a6; font: 8px ui-monospace, monospace; text-overflow: ellipsis; white-space: nowrap; }
+.transport-controls button:disabled { cursor: default; opacity: .6; }

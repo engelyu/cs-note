@@ -1,32 +1,11 @@
 import type {
   ExecutionFrame,
   ExecutionEvent,
-  LayoutRect,
   VisualizationPackage,
 } from "../core/types";
+import type { GraphEdge, TarjanState } from "./tarjanModel";
 
-export type GraphEdge = { from: number; to: number };
-
-export type TarjanState = {
-  labels: string[];
-  edges: GraphEdge[];
-  disc: number[];
-  low: number[];
-  onStack: boolean[];
-  stack: number[];
-  components: number[][];
-  current: number | null;
-  activeEdge: GraphEdge | null;
-  line: string;
-};
-
-export const TARJAN_LAYOUT: Record<string, LayoutRect> = {
-  "node:A": { x: 110, y: 90, width: 64, height: 64 },
-  "node:B": { x: 290, y: 90, width: 64, height: 64 },
-  "node:C": { x: 200, y: 250, width: 64, height: 64 },
-  "node:D": { x: 440, y: 90, width: 64, height: 64 },
-  "node:E": { x: 440, y: 250, width: 64, height: 64 },
-};
+export type { GraphEdge, TarjanState } from "./tarjanModel";
 
 const LABELS = ["A", "B", "C", "D", "E"];
 const EDGES: GraphEdge[] = [
@@ -48,7 +27,7 @@ function snapshot(state: TarjanState): TarjanState {
     components: state.components.map((component) => [...component]),
     current: state.current,
     activeEdge: state.activeEdge ? { ...state.activeEdge } : null,
-    line: state.line,
+    phase: state.phase,
   };
 }
 
@@ -63,7 +42,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
     components: [],
     current: null,
     activeEdge: null,
-    line: "tarjan",
+    phase: "init",
   };
   const frames: ExecutionFrame<TarjanState>[] = [];
   let time = 0;
@@ -107,7 +86,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
     state.onStack[u] = true;
     state.current = u;
     state.activeEdge = null;
-    state.line = "visit";
+    state.phase = "visit";
     emit(
       "visit",
       `Visit ${LABELS[u]}`,
@@ -120,7 +99,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
       state.current = u;
       state.activeEdge = { from: u, to: v };
       if (state.disc[v] === -1) {
-        state.line = "tree-edge";
+        state.phase = "tree-edge";
         emit(
           "tree-edge",
           `${LABELS[u]} → ${LABELS[v]}`,
@@ -131,7 +110,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
         dfs(v);
         const before = state.low[u];
         state.low[u] = Math.min(state.low[u], state.low[v]);
-        state.line = "return";
+        state.phase = "return";
         emit(
           "return",
           `Return to ${LABELS[u]}`,
@@ -142,7 +121,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
       } else if (state.onStack[v]) {
         const before = state.low[u];
         state.low[u] = Math.min(state.low[u], state.disc[v]);
-        state.line = "back-edge";
+        state.phase = "back-edge";
         emit(
           "back-edge",
           `Back edge ${LABELS[u]} → ${LABELS[v]}`,
@@ -151,7 +130,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
           { kind: "entity", id: `edge:${u}-${v}` },
         );
       } else {
-        state.line = "cross-edge";
+        state.phase = "cross-edge";
         emit(
           "cross-edge",
           `Ignore ${LABELS[u]} → ${LABELS[v]}`,
@@ -165,7 +144,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
     state.current = u;
     state.activeEdge = null;
     if (state.low[u] === state.disc[u]) {
-      state.line = "root";
+      state.phase = "root";
       emit(
         "root",
         `${LABELS[u]} closes an SCC`,
@@ -182,7 +161,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
       }
       component.sort((a, b) => a - b);
       state.components.push(component);
-      state.line = "pop-scc";
+      state.phase = "pop-scc";
       emit(
         "scc",
         `Found {${component.map((member) => LABELS[member]).join(", ")}}`,
@@ -191,7 +170,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
         { kind: "concept", id: "scc" },
       );
     } else {
-      state.line = "wait";
+      state.phase = "wait";
       emit(
         "wait",
         `Keep ${LABELS[u]} on stack`,
@@ -207,7 +186,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
   }
 
   state.current = null;
-  state.line = "done";
+  state.phase = "done";
   emit(
     "done",
     "Complete",
@@ -218,7 +197,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
   return frames;
 }
 
-export const tarjanPackage: VisualizationPackage<TarjanState> = {
+export const tarjanAuthoringPackage: VisualizationPackage<TarjanState> = {
   id: "tarjan-scc",
   title: "Tarjan's Strongly Connected Components",
   category: "Algorithms",
@@ -234,7 +213,7 @@ export const tarjanPackage: VisualizationPackage<TarjanState> = {
     {
       id: "simple-cycle",
       title: "The simplest cycle",
-      description: "A compact graph that exposes tree edges, a back edge, and two SCCs.",
+      description: "A compact graph that exposes tree edges, a back edge, and three SCCs.",
       frames: createTarjanFrames(),
     },
   ],
