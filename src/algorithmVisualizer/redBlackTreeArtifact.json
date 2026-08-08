@@ -7,12 +7,12 @@
   { "key": "log", "method": "println", "args": ["Insert 10, 20, 30, 15, 25, 27, and 5"] },
   { "key": null, "method": "delay", "args": [1] },
 
-  { "key": "graph", "method": "addNode", "args": [10, 10, 100, 80] },
+  { "key": "graph", "method": "addNode", "args": [10, 10, 260, 80] },
   { "key": "graph", "method": "setNodeColor", "args": [10, "black"] },
   { "key": "log", "method": "println", "args": ["Insert 10: the root is black"] },
   { "key": null, "method": "delay", "args": [8] },
 
-  { "key": "graph", "method": "addNode", "args": [20, 20, 280, 220] },
+  { "key": "graph", "method": "addNode", "args": [20, 20, 390, 220] },
   { "key": "graph", "method": "setNodeColor", "args": [20, "red"] },
   { "key": "graph", "method": "addEdge", "args": [10, 20] },
   { "key": "graph", "method": "select", "args": [20] },
@@ -41,7 +41,7 @@
   { "key": "log", "method": "println", "args": ["Left rotation makes 20 the black root"] },
   { "key": null, "method": "delay", "args": [35] },
 
-  { "key": "graph", "method": "addNode", "args": [15, 15, 60, 360] },
+  { "key": "graph", "method": "addNode", "args": [15, 15, 220, 360] },
   { "key": "graph", "method": "setNodeColor", "args": [15, "red"] },
   { "key": "graph", "method": "addEdge", "args": [10, 15] },
   { "key": "graph", "method": "select", "args": [15] },
@@ -54,13 +54,13 @@
   { "key": "log", "method": "println", "args": ["Recolor the red parent and its red uncle black"] },
   { "key": null, "method": "delay", "args": [51] },
 
-  { "key": "graph", "method": "addNode", "args": [25, 25, 280, 360] },
+  { "key": "graph", "method": "addNode", "args": [25, 25, 390, 360] },
   { "key": "graph", "method": "setNodeColor", "args": [25, "red"] },
   { "key": "graph", "method": "addEdge", "args": [30, 25] },
   { "key": "log", "method": "println", "args": ["Insert 25 under black 30"] },
   { "key": null, "method": "delay", "args": [59] },
 
-  { "key": "graph", "method": "addNode", "args": [27, 27, 370, 220] },
+  { "key": "graph", "method": "addNode", "args": [27, 27, 440, 220] },
   { "key": "graph", "method": "setNodeColor", "args": [27, "red"] },
   { "key": "graph", "method": "addEdge", "args": [25, 27] },
   { "key": "graph", "method": "select", "args": [27] },
@@ -84,7 +84,7 @@
   { "key": "log", "method": "println", "args": ["Right rotation at 30 restores balance"] },
   { "key": null, "method": "delay", "args": [81] },
 
-  { "key": "graph", "method": "addNode", "args": [5, 5, -200, 360] },
+  { "key": "graph", "method": "addNode", "args": [5, 5, 0, 360] },
   { "key": "graph", "method": "setNodeColor", "args": [5, "red"] },
   { "key": "graph", "method": "addEdge", "args": [10, 5] },
   { "key": "log", "method": "println", "args": ["Insert 5: the black-height invariant still holds"] },
