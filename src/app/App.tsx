@@ -52,6 +52,12 @@ const layoutOnlyTools = {
   laser: false,
 };
 
+function sameSelectedElementIds(left: Readonly<Record<string, boolean>>, right: Readonly<Record<string, boolean>>): boolean {
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  return leftKeys.length === rightKeys.length && leftKeys.every((key) => left[key] === right[key]);
+}
+
 export function App() {
   const [algorithm, setAlgorithm] = useState<AlgorithmId>("tarjan");
   return (
@@ -202,7 +208,9 @@ function AlgorithmVisualizerWorkbench() {
   const changeStep = (next: number) => setStep(Math.max(0, Math.min(algorithmVisualizerDfsFrames.length - 1, next)));
   const handleCanvasChange = (nextElements: readonly unknown[], appState?: { selectedElementIds?: Record<string, boolean> }) => {
     if (applyingSceneRef.current) return;
-    if (appState?.selectedElementIds) setSelectedElementIds({ ...appState.selectedElementIds });
+    if (appState?.selectedElementIds) {
+      setSelectedElementIds((previous) => sameSelectedElementIds(previous, appState.selectedElementIds as Record<string, boolean>) ? previous : { ...appState.selectedElementIds });
+    }
     const typedElements = nextElements as AlgorithmVisualizerCanvasElement[];
     const nextLayout = captureAlgorithmVisualizerGraphLayout(typedElements, layout);
     const changed = Object.keys(nextLayout).some((id) => {
