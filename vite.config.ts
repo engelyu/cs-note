@@ -3,8 +3,10 @@ import react from "@vitejs/plugin-react";
 import path from "node:path";
 
 const excalidrawVendor = path.resolve(process.cwd(), "vendor/excalidraw");
+const base = process.env.VITE_BASE ?? "/";
 
 export default defineConfig({
+  base,
   plugins: [react({ jsxRuntime: "classic" })],
   resolve: {
     alias: [
