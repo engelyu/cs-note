@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { convertToExcalidrawElements, Excalidraw } from "../excalidraw";
+import { convertToStableExcalidrawElements, Excalidraw } from "../excalidraw";
 import type { LayoutRect } from "../core/types";
-import { captureTarjanLayout, createTarjanSkeletons, isTarjanSceneSafe } from "../visualizations/tarjanScene";
+import {
+  captureTarjanLayout,
+  createTarjanSkeletons,
+  isTarjanSceneExact,
+  isTarjanSceneSafe,
+} from "../visualizations/tarjanScene";
+import type { CanvasElementSnapshot } from "../visualizations/tarjanScene";
 import { TARJAN_LAYOUT } from "../visualizations/tarjanLayout";
 import { tarjanPackage } from "../visualizations/tarjanRuntime";
 import type { TarjanState } from "../visualizations/tarjanModel";
@@ -14,33 +20,6 @@ import {
 } from "../visualizations/tarjanProjections";
 
 type PanelId = "variables" | "call-stack" | "concepts" | "timeline";
-
-type ExcalidrawElement = {
-  id?: string;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  type?: string;
-  points?: unknown;
-  start?: unknown;
-  end?: unknown;
-  startArrowhead?: unknown;
-  endArrowhead?: unknown;
-  strokeColor?: string;
-  backgroundColor?: string;
-  fillStyle?: string;
-  strokeWidth?: number;
-  strokeStyle?: string;
-  roughness?: number;
-  opacity?: number;
-  roundness?: unknown;
-  label?: unknown;
-  fontSize?: number;
-  customData?: unknown;
-  isDeleted?: boolean;
-  locked?: boolean;
-};
 
 type ExcalidrawApi = {
   updateScene: (scene: { elements: unknown[] }) => void;
@@ -81,7 +60,7 @@ export function App() {
   const frame = frames[step];
 
   const elements = useMemo(
-    () => convertToExcalidrawElements(createTarjanSkeletons(frame.state, layout)),
+    () => convertToStableExcalidrawElements(createTarjanSkeletons(frame.state, layout)),
     [frame, layout],
   );
 
@@ -99,16 +78,21 @@ export function App() {
 
   const handleCanvasChange = (nextElements: readonly unknown[]) => {
     if (applyingSceneRef.current) return;
-    const nextLayout = captureTarjanLayout(nextElements as ExcalidrawElement[], layout);
+    const nextLayout = captureTarjanLayout(nextElements as CanvasElementSnapshot[], layout);
     const changed = Object.keys(nextLayout).some((id) => {
       const before = layout[id];
       const after = nextLayout[id];
       return before.x !== after.x || before.y !== after.y || before.width !== after.width || before.height !== after.height;
     });
-    if (changed) setLayout(nextLayout);
+    if (changed && capabilities.editLayout) setLayout(nextLayout);
 
-    const canonicalElements = convertToExcalidrawElements(createTarjanSkeletons(frame.state, nextLayout));
-    if (!isTarjanSceneSafe(nextElements as ExcalidrawElement[], canonicalElements as ExcalidrawElement[])) {
+    const canonicalElements = convertToStableExcalidrawElements(
+      createTarjanSkeletons(frame.state, capabilities.editLayout ? nextLayout : layout),
+    );
+    const sceneIsAllowed = capabilities.editLayout
+      ? isTarjanSceneSafe(nextElements as CanvasElementSnapshot[], canonicalElements as CanvasElementSnapshot[])
+      : isTarjanSceneExact(nextElements as CanvasElementSnapshot[], canonicalElements as CanvasElementSnapshot[]);
+    if (!sceneIsAllowed) {
       applyingSceneRef.current = true;
       apiRef.current?.updateScene({ elements: canonicalElements });
       window.setTimeout(() => { applyingSceneRef.current = false; }, 0);
@@ -167,7 +151,7 @@ export function App() {
                 initialData={{ elements, appState: { viewBackgroundColor: "#17191f" } }}
                 theme="dark"
                 excalidrawAPI={(api: unknown) => { apiRef.current = api as ExcalidrawApi; }}
-                onChange={capabilities.editLayout ? handleCanvasChange : undefined}
+                onChange={handleCanvasChange}
                 UIOptions={{
                   tools: capabilities.editInput ? undefined : layoutOnlyTools,
                   canvasActions: {

@@ -61,6 +61,14 @@ const EDGE_SCENE_FIELDS = [
   "endArrowhead",
 ] as const;
 
+const NODE_SCENE_FIELDS = [
+  ...SHARED_SCENE_FIELDS,
+  "x",
+  "y",
+  "width",
+  "height",
+] as const;
+
 function sceneSignature(element: CanvasElementSnapshot, fields: readonly string[]): string {
   return JSON.stringify(Object.fromEntries(fields.map((field) => [field, element[field as keyof CanvasElementSnapshot]])));
 }
@@ -76,6 +84,21 @@ export function isTarjanSceneSafe(
     const next = nextById.get(canonical.id);
     if (!next) return false;
     const fields = canonical.id?.startsWith("node:") ? SHARED_SCENE_FIELDS : EDGE_SCENE_FIELDS;
+    return sceneSignature(next, fields) === sceneSignature(canonical, fields);
+  });
+}
+
+export function isTarjanSceneExact(
+  nextElements: readonly CanvasElementSnapshot[],
+  canonicalElements: readonly CanvasElementSnapshot[],
+): boolean {
+  if (nextElements.length !== canonicalElements.length) return false;
+
+  const nextById = new Map(nextElements.map((element) => [element.id, element]));
+  return canonicalElements.every((canonical) => {
+    const next = nextById.get(canonical.id);
+    if (!next) return false;
+    const fields = canonical.id?.startsWith("node:") ? NODE_SCENE_FIELDS : EDGE_SCENE_FIELDS;
     return sceneSignature(next, fields) === sceneSignature(canonical, fields);
   });
 }

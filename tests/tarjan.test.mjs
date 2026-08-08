@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createTarjanFrames } from "../src/visualizations/tarjan.ts";
 import { tarjanPackage } from "../src/visualizations/tarjanRuntime.ts";
-import { captureTarjanLayout, createTarjanSkeletons, isTarjanSceneSafe } from "../src/visualizations/tarjanScene.ts";
+import { stabilizeExcalidrawElementIds } from "../src/excalidrawIds.ts";
+import {
+  captureTarjanLayout,
+  createTarjanSkeletons,
+  isTarjanSceneExact,
+  isTarjanSceneSafe,
+} from "../src/visualizations/tarjanScene.ts";
 import {
   projectTarjanCallStack,
   projectTarjanConcepts,
@@ -113,11 +119,24 @@ test("Graph Canvas restores semantic edits while preserving node layout edits", 
   const addedElement = [...canonical, { id: "user-drawn-line", type: "line" }];
 
   assert.equal(isTarjanSceneSafe(movedNode, canonical), true);
+  assert.equal(isTarjanSceneExact(movedNode, canonical), false);
+  assert.equal(isTarjanSceneExact(canonical, canonical), true);
   assert.equal(isTarjanSceneSafe(recoloredNode, canonical), false);
   assert.equal(isTarjanSceneSafe(deletedNode, canonical), false);
   assert.equal(isTarjanSceneSafe(addedElement, canonical), false);
   const focusedElementId = frame.event.focus?.id;
   assert.equal(canonical.some((element) => element.id === focusedElementId), true);
+});
+
+test("Canvas adapter gives generated labels stable logical IDs", () => {
+  const converted = [
+    { id: "node:A", boundElements: [{ type: "text", id: "generated-label" }] },
+    { id: "generated-label", type: "text", containerId: "node:A" },
+  ];
+  const stabilized = stabilizeExcalidrawElementIds(converted, new Set(["node:A"]));
+
+  assert.equal(stabilized[1].id, "label:node:A");
+  assert.deepEqual(stabilized[0].boundElements, [{ type: "text", id: "label:node:A" }]);
 });
 
 test("Debugger projections derive from the current semantic frame", () => {
