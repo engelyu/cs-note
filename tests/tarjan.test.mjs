@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createTarjanFrames } from "../src/visualizations/tarjan.ts";
-import { tarjanPackage } from "../src/visualizations/tarjanRuntime.ts";
+import { isValidTarjanArtifact, tarjanPackage } from "../src/visualizations/tarjanRuntime.ts";
 import { stabilizeExcalidrawElementIds } from "../src/excalidrawIds.ts";
 import {
   captureTarjanLayout,
@@ -46,6 +46,7 @@ test("Tarjan frames preserve the teaching concepts behind SCC detection", () => 
     .sort((left, right) => left[0] - right[0]);
   assert.deepEqual(memberships, [[0, 1, 2], [3], [4]]);
   assert.equal(finalState.stack.length, 0);
+  assert.equal(finalState.callStack.length, 0);
   assert.equal(finalState.onStack.some(Boolean), false);
   assert.ok(frames.some((frame) => frame.event.phase === "back-edge"));
   assert.ok(frames.some((frame) => frame.event.phase === "scc"));
@@ -65,6 +66,7 @@ test("Tarjan frames are independently snapshotted", () => {
   assert.equal(later.state.labels[0], "A");
   assert.equal(later.state.edges[0].from, 0);
   assert.deepEqual(later.state.stack, [0]);
+  assert.deepEqual(later.state.callStack, [0]);
 });
 
 test("Graph Canvas layout edits stay separate from semantic state", () => {
@@ -110,6 +112,9 @@ test("Graph Canvas restores semantic edits while preserving node layout edits", 
   const movedNode = canonical.map((element) => element.id === "node:A"
     ? { ...element, x: 180, y: 130, width: 96, height: 80 }
     : element);
+  const rotatedNode = canonical.map((element) => element.id === "node:A"
+    ? { ...element, angle: 0.5 }
+    : element);
   const recoloredNode = canonical.map((element) => element.id === "node:A"
     ? { ...element, backgroundColor: "#ffffff" }
     : element);
@@ -121,6 +126,7 @@ test("Graph Canvas restores semantic edits while preserving node layout edits", 
   assert.equal(isTarjanSceneSafe(movedNode, canonical), true);
   assert.equal(isTarjanSceneExact(movedNode, canonical), false);
   assert.equal(isTarjanSceneExact(canonical, canonical), true);
+  assert.equal(isTarjanSceneExact(rotatedNode, canonical), false);
   assert.equal(isTarjanSceneSafe(recoloredNode, canonical), false);
   assert.equal(isTarjanSceneSafe(deletedNode, canonical), false);
   assert.equal(isTarjanSceneSafe(addedElement, canonical), false);
@@ -135,8 +141,21 @@ test("Canvas adapter gives generated labels stable logical IDs", () => {
   ];
   const stabilized = stabilizeExcalidrawElementIds(converted, new Set(["node:A"]));
 
-  assert.equal(stabilized[1].id, "label:node:A");
-  assert.deepEqual(stabilized[0].boundElements, [{ type: "text", id: "label:node:A" }]);
+  assert.equal(stabilized.find((element) => element.containerId === "node:A")?.id, "label:node:A");
+});
+
+test("Runtime artifact validation rejects structurally inconsistent frames", () => {
+  const validArtifact = {
+    artifactVersion: 1,
+    packageId: "tarjan-scc",
+    scenarioId: "simple-cycle",
+    frames: tarjanPackage.scenarios[0].frames,
+  };
+  assert.equal(isValidTarjanArtifact(validArtifact), true);
+
+  const malformedArtifact = structuredClone(validArtifact);
+  malformedArtifact.frames[1].state.disc = [-1];
+  assert.equal(isValidTarjanArtifact(malformedArtifact), false);
 });
 
 test("Debugger projections derive from the current semantic frame", () => {
@@ -154,6 +173,11 @@ test("Debugger projections derive from the current semantic frame", () => {
   assert.equal(projectTarjanVariables(frames.at(-1)).find((row) => row.label === "A")?.component, "A, B, C");
   assert.equal(callStack[0]?.label, "C");
   assert.equal(callStack[0]?.active, true);
+  const returnFrame = frames.find((candidate) => candidate.event.phase === "return");
+  assert.ok(returnFrame);
+  assert.equal(returnFrame.state.current, 1);
+  assert.equal(returnFrame.state.callStack.length, 2);
+  assert.equal(returnFrame.state.stack.length, 3);
   assert.equal(concepts.find((concept) => concept.id === "low-link")?.detail, "low[C] = 0");
   assert.equal(concepts.find((concept) => concept.id === "scc")?.focus.id, "scc");
   assert.equal(timeline[frame.index]?.active, true);

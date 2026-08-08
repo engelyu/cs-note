@@ -185,7 +185,7 @@ export function App() {
 
         {(!capabilities.toggleView || inspectorVisible) && <aside className="secondary-sidebar">
           <div className="panel-tabs">{panelIds.map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div>
-          <div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "call-stack" ? `${frame.state.stack.length} frames` : panel === "concepts" ? "4 concepts" : `${frames.length} events`}</small></div>
+          <div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "call-stack" ? `${frame.state.callStack.length} frames` : panel === "concepts" ? "4 concepts" : `${frames.length} events`}</small></div>
           <div className="panel-body">{panel === "variables" ? <VariablesPanel frame={frame} /> : panel === "call-stack" ? <CallStackPanel frame={frame} /> : panel === "concepts" ? <ConceptsPanel frame={frame} /> : <TimelinePanel frameIndex={frame.index} onSelect={changeStep} />}</div>
           <div className="watch-panel"><div className="panel-heading"><span>WATCH</span><small>semantic</small></div><div className="watch-row"><span>current</span><b>{frame.state.current == null ? "—" : frame.state.labels[frame.state.current]}</b></div><div className="watch-row"><span>components</span><b>{componentSummary}</b></div><div className="watch-row"><span>phase</span><b>{frame.state.phase}</b></div></div>
         </aside>}

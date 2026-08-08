@@ -19,6 +19,7 @@ export type TarjanState = {
   low: number[];
   onStack: boolean[];
   stack: number[];
+  callStack: number[];
   components: number[][];
   current: number | null;
   activeEdge: GraphEdge | null;

@@ -29,10 +29,21 @@
 <script type="module">
   import { createRoot } from 'react-dom/client';
   import { createElement as h } from 'react';
-  import { Excalidraw } from '@excalidraw/excalidraw';
+  import { Excalidraw, convertToExcalidrawElements } from '@excalidraw/excalidraw';
 
   window.__smokeError = null;
   window.addEventListener('error', (e) => { window.__smokeError = String(e.error || e.message); });
+
+  const boundaryScene = convertToExcalidrawElements([
+    { type: 'ellipse', id: 'node:smoke', x: 0, y: 0, width: 64, height: 64, label: { text: 'S' } },
+    { type: 'arrow', id: 'edge:smoke', x: 0, y: 0, width: 64, height: 0, points: [[0, 0], [64, 0]], start: { id: 'node:smoke' }, end: { id: 'node:smoke' } },
+  ], { regenerateIds: false });
+  window.__smokeStableIds = {
+    node: boundaryScene.some((element) => element.id === 'node:smoke'),
+    edge: boundaryScene.some((element) => element.id === 'edge:smoke'),
+    label: boundaryScene.some((element) => element.containerId === 'node:smoke'),
+  };
+  document.body.dataset.smokeStableIds = Object.values(window.__smokeStableIds).join(',');
 
   const root = createRoot(document.getElementById('app'));
   root.render(h(Excalidraw, {}));

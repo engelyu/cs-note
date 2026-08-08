@@ -13,6 +13,8 @@ export type CanvasElementSnapshot = {
   points?: unknown;
   start?: unknown;
   end?: unknown;
+  startBinding?: unknown;
+  endBinding?: unknown;
   startArrowhead?: unknown;
   endArrowhead?: unknown;
   strokeColor?: string;
@@ -23,7 +25,18 @@ export type CanvasElementSnapshot = {
   roughness?: number;
   opacity?: number;
   roundness?: unknown;
+  angle?: number;
+  boundElements?: unknown;
+  containerId?: unknown;
+  frameId?: unknown;
+  groupIds?: unknown;
   label?: unknown;
+  text?: string;
+  originalText?: string;
+  fontFamily?: number;
+  textAlign?: string;
+  verticalAlign?: string;
+  autoResize?: boolean;
   fontSize?: number;
   customData?: unknown;
   isDeleted?: boolean;
@@ -41,7 +54,18 @@ const SHARED_SCENE_FIELDS = [
   "roughness",
   "opacity",
   "roundness",
+  "angle",
+  "boundElements",
+  "containerId",
+  "frameId",
+  "groupIds",
   "label",
+  "text",
+  "originalText",
+  "fontFamily",
+  "textAlign",
+  "verticalAlign",
+  "autoResize",
   "fontSize",
   "customData",
   "isDeleted",
@@ -57,6 +81,8 @@ const EDGE_SCENE_FIELDS = [
   "points",
   "start",
   "end",
+  "startBinding",
+  "endBinding",
   "startArrowhead",
   "endArrowhead",
 ] as const;

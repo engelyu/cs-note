@@ -59,7 +59,7 @@ export function projectTarjanConceptLabel(state: TarjanState): string {
 }
 
 export function projectTarjanCallStack(frame: TarjanFrame): TarjanCallStackEntry[] {
-  return [...frame.state.stack].reverse().map((index, depth) => ({
+  return [...frame.state.callStack].reverse().map((index, depth) => ({
     label: frame.state.labels[index],
     disc: frame.state.disc[index],
     low: frame.state.low[index],

@@ -10,17 +10,20 @@
     "test": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types --test tests/tarjan.test.mjs",
     "generate:tarjan": "node --experimental-strip-types scripts/generate-tarjan-artifact.mjs",
     "verify:tarjan": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs",
-    "patch:excalidraw-tools": "node scripts/patch-excalidraw-tools.mjs"
+    "patch:excalidraw-tools": "node scripts/patch-excalidraw-tools.mjs",
+    "vendor:excalidraw": "node scripts/vendor-excalidraw.mjs"
   },
   "dependencies": {
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@excalidraw/excalidraw": "0.18.1",
     "@types/node": "^26.2.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
+    "esbuild": "0.28.1",
     "typescript": "5.9.3",
     "vite": "8.0.13"
   }

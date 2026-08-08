@@ -20,6 +20,7 @@ function snapshot(state: TarjanState): TarjanState {
     low: [...state.low],
     onStack: [...state.onStack],
     stack: [...state.stack],
+    callStack: [...state.callStack],
     components: state.components.map((component) => [...component]),
     current: state.current,
     activeEdge: state.activeEdge ? { ...state.activeEdge } : null,
@@ -35,6 +36,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
     low: LABELS.map(() => -1),
     onStack: LABELS.map(() => false),
     stack: [],
+    callStack: [],
     components: [],
     current: null,
     activeEdge: null,
@@ -79,6 +81,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
     state.low[u] = time;
     time += 1;
     state.stack.push(u);
+    state.callStack.push(u);
     state.onStack[u] = true;
     state.current = u;
     state.activeEdge = null;
@@ -104,6 +107,8 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
           { kind: "entity", id: `edge:${u}-${v}` },
         );
         dfs(v);
+        state.current = u;
+        state.activeEdge = null;
         const before = state.low[u];
         state.low[u] = Math.min(state.low[u], state.low[v]);
         state.phase = "return";
@@ -175,6 +180,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
         { kind: "entity", id: `node:${LABELS[u]}` },
       );
     }
+    state.callStack.pop();
   };
 
   for (let root = 0; root < LABELS.length; root += 1) {
