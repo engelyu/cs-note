@@ -35,6 +35,7 @@ button:focus-visible { outline: 2px solid #79b8ff; outline-offset: 2px; }
 .scenario-card { width: calc(100% - 20px); margin: 0 10px; padding: 10px 8px; display: grid; grid-template-columns: 30px 1fr 10px; gap: 7px; align-items: center; text-align: left; border: 1px solid transparent; border-radius: 6px; background: transparent; cursor: pointer; }
 .scenario-card:hover, .scenario-card.active { background: #242731; border-color: #353a48; }
 .scenario-index { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 5px; background: #294b5a; color: #8dd1ed; font: 10px ui-monospace, monospace; }
+.scenario-index.lis-index { background: #473a65; color: #c6b9ff; }
 .scenario-card span:nth-child(2), .session-card span:last-child { display: flex; flex-direction: column; gap: 4px; }
 .scenario-card strong, .session-card strong { color: #e7e9ee; font-size: 11px; font-weight: 600; line-height: 1.3; }
 .scenario-card small, .session-card small { color: #7f8796; font-size: 9px; }
@@ -65,7 +66,7 @@ button:focus-visible { outline: 2px solid #79b8ff; outline-offset: 2px; }
 .canvas-legend { position: absolute; z-index: 4; bottom: 12px; left: 15px; display: flex; gap: 12px; padding: 7px 9px; border: 1px solid #303540; border-radius: 5px; background: #1a1d23dd; color: #929aa9; font-size: 8px; pointer-events: none; }
 .canvas-legend span { display: flex; align-items: center; gap: 5px; }
 .legend-swatch { width: 7px; height: 7px; border-radius: 50%; }
-.legend-swatch.on-stack { background: #63a7ff; }.legend-swatch.component { background: #55d6be; }.legend-ring { width: 8px; height: 8px; border: 2px solid #f2b84b; border-radius: 50%; }
+.legend-swatch.on-stack { background: #63a7ff; }.legend-swatch.component { background: #55d6be; }.legend-swatch.sequence { background: #55d6be; }.legend-swatch.compare { background: #63a7ff; }.legend-ring { width: 8px; height: 8px; border: 2px solid #f2b84b; border-radius: 50%; }
 .canvas-hint { position: absolute; right: 16px; bottom: 15px; z-index: 4; color: #667181; font-size: 8px; pointer-events: none; }
 
 .explain-strip { display: flex; align-items: center; gap: 14px; padding: 0 23px; border-top: 1px solid #272a33; border-bottom: 1px solid #272a33; background: #17191e; }

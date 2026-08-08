@@ -1,0 +1,4539 @@
+{
+  "artifactVersion": 1,
+  "packageId": "lis-dp",
+  "scenarioId": "classic-sequence",
+  "frames": [
+    {
+      "index": 0,
+      "event": {
+        "id": "lis-0",
+        "phase": "init",
+        "label": "Start dynamic programming",
+        "detail": "For every position i, dp[i] stores the longest increasing subsequence that ends at i.",
+        "focus": {
+          "kind": "concept",
+          "id": "dp"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": null,
+        "currentIndex": null,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "init"
+      },
+      "changedIds": []
+    },
+    {
+      "index": 1,
+      "event": {
+        "id": "lis-1",
+        "phase": "visit",
+        "label": "Consider a[0] = 10",
+        "detail": "Start with dp[0] = 1: the value itself is an increasing subsequence of length one.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:0"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": null,
+        "currentIndex": 0,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "cell:0"
+      ]
+    },
+    {
+      "index": 2,
+      "event": {
+        "id": "lis-2",
+        "phase": "best",
+        "label": "Best length is 1",
+        "detail": "The longest subsequence found so far ends at a[0] = 10.",
+        "focus": {
+          "kind": "concept",
+          "id": "best"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 0,
+        "currentIndex": 0,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "best"
+      },
+      "changedIds": [
+        "cell:0"
+      ]
+    },
+    {
+      "index": 3,
+      "event": {
+        "id": "lis-3",
+        "phase": "visit",
+        "label": "Consider a[1] = 22",
+        "detail": "Start with dp[1] = 1: the value itself is an increasing subsequence of length one.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:1"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 0,
+        "currentIndex": 1,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "cell:1"
+      ]
+    },
+    {
+      "index": 4,
+      "event": {
+        "id": "lis-4",
+        "phase": "compare",
+        "label": "Compare a[0] with a[1]",
+        "detail": "Check whether a[0] = 10 can precede a[1] = 22.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:1"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 0,
+        "currentIndex": 1,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 1
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:1"
+      ]
+    },
+    {
+      "index": 5,
+      "event": {
+        "id": "lis-5",
+        "phase": "update",
+        "label": "Extend from a[0] to a[1]",
+        "detail": "a[0] = 10 < 22, so dp[1] becomes max(1, dp[0] + 1) = 2.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 0,
+        "currentIndex": 1,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 1
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:1",
+        "link:0-1"
+      ]
+    },
+    {
+      "index": 6,
+      "event": {
+        "id": "lis-6",
+        "phase": "best",
+        "label": "Best length is 2",
+        "detail": "The longest subsequence found so far ends at a[1] = 22.",
+        "focus": {
+          "kind": "concept",
+          "id": "best"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 1,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "best"
+      },
+      "changedIds": [
+        "cell:1"
+      ]
+    },
+    {
+      "index": 7,
+      "event": {
+        "id": "lis-7",
+        "phase": "visit",
+        "label": "Consider a[2] = 9",
+        "detail": "Start with dp[2] = 1: the value itself is an increasing subsequence of length one.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:2"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 2,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "cell:2"
+      ]
+    },
+    {
+      "index": 8,
+      "event": {
+        "id": "lis-8",
+        "phase": "compare",
+        "label": "Compare a[0] with a[2]",
+        "detail": "Check whether a[0] = 10 can precede a[2] = 9.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:2"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 2,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 2
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:2"
+      ]
+    },
+    {
+      "index": 9,
+      "event": {
+        "id": "lis-9",
+        "phase": "skip",
+        "label": "Skip a[0] as a predecessor",
+        "detail": "a[0] = 10 is not smaller than 9, so this pair cannot be increasing.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:2"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 2,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 2
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:2"
+      ]
+    },
+    {
+      "index": 10,
+      "event": {
+        "id": "lis-10",
+        "phase": "compare",
+        "label": "Compare a[1] with a[2]",
+        "detail": "Check whether a[1] = 22 can precede a[2] = 9.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:2"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 2,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 2
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:2"
+      ]
+    },
+    {
+      "index": 11,
+      "event": {
+        "id": "lis-11",
+        "phase": "skip",
+        "label": "Skip a[1] as a predecessor",
+        "detail": "a[1] = 22 is not smaller than 9, so this pair cannot be increasing.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:2"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 2,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 2
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:2"
+      ]
+    },
+    {
+      "index": 12,
+      "event": {
+        "id": "lis-12",
+        "phase": "best",
+        "label": "Best stays 2",
+        "detail": "a[2] ends a subsequence of length 1, so the global best does not change.",
+        "focus": {
+          "kind": "concept",
+          "id": "best"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 2,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "best"
+      },
+      "changedIds": [
+        "cell:2"
+      ]
+    },
+    {
+      "index": 13,
+      "event": {
+        "id": "lis-13",
+        "phase": "visit",
+        "label": "Consider a[3] = 33",
+        "detail": "Start with dp[3] = 1: the value itself is an increasing subsequence of length one.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:3"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 3,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "cell:3"
+      ]
+    },
+    {
+      "index": 14,
+      "event": {
+        "id": "lis-14",
+        "phase": "compare",
+        "label": "Compare a[0] with a[3]",
+        "detail": "Check whether a[0] = 10 can precede a[3] = 33.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:3"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 3,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 3
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:3"
+      ]
+    },
+    {
+      "index": 15,
+      "event": {
+        "id": "lis-15",
+        "phase": "update",
+        "label": "Extend from a[0] to a[3]",
+        "detail": "a[0] = 10 < 33, so dp[3] becomes max(1, dp[0] + 1) = 2.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          0,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 3,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 3
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:3",
+        "link:0-3"
+      ]
+    },
+    {
+      "index": 16,
+      "event": {
+        "id": "lis-16",
+        "phase": "compare",
+        "label": "Compare a[1] with a[3]",
+        "detail": "Check whether a[1] = 22 can precede a[3] = 33.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:3"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          0,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 3,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 3
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:3"
+      ]
+    },
+    {
+      "index": 17,
+      "event": {
+        "id": "lis-17",
+        "phase": "update",
+        "label": "Extend from a[1] to a[3]",
+        "detail": "a[1] = 22 < 33, so dp[3] becomes max(2, dp[1] + 1) = 3.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 3,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 3
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:3",
+        "link:1-3"
+      ]
+    },
+    {
+      "index": 18,
+      "event": {
+        "id": "lis-18",
+        "phase": "compare",
+        "label": "Compare a[2] with a[3]",
+        "detail": "Check whether a[2] = 9 can precede a[3] = 33.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:3"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 3,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 3
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:3"
+      ]
+    },
+    {
+      "index": 19,
+      "event": {
+        "id": "lis-19",
+        "phase": "skip",
+        "label": "Keep dp[3] = 3",
+        "detail": "a[2] < a[3], but dp[2] + 1 = 2 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:3"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 1,
+        "currentIndex": 3,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 3
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:3"
+      ]
+    },
+    {
+      "index": 20,
+      "event": {
+        "id": "lis-20",
+        "phase": "best",
+        "label": "Best length is 3",
+        "detail": "The longest subsequence found so far ends at a[3] = 33.",
+        "focus": {
+          "kind": "concept",
+          "id": "best"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 3,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "best"
+      },
+      "changedIds": [
+        "cell:3"
+      ]
+    },
+    {
+      "index": 21,
+      "event": {
+        "id": "lis-21",
+        "phase": "visit",
+        "label": "Consider a[4] = 21",
+        "detail": "Start with dp[4] = 1: the value itself is an increasing subsequence of length one.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:4"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "cell:4"
+      ]
+    },
+    {
+      "index": 22,
+      "event": {
+        "id": "lis-22",
+        "phase": "compare",
+        "label": "Compare a[0] with a[4]",
+        "detail": "Check whether a[0] = 10 can precede a[4] = 21.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:4"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          null,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 4
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:4"
+      ]
+    },
+    {
+      "index": 23,
+      "event": {
+        "id": "lis-23",
+        "phase": "update",
+        "label": "Extend from a[0] to a[4]",
+        "detail": "a[0] = 10 < 21, so dp[4] becomes max(1, dp[0] + 1) = 2.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 4
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:4",
+        "link:0-4"
+      ]
+    },
+    {
+      "index": 24,
+      "event": {
+        "id": "lis-24",
+        "phase": "compare",
+        "label": "Compare a[1] with a[4]",
+        "detail": "Check whether a[1] = 22 can precede a[4] = 21.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:4"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 4
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:4"
+      ]
+    },
+    {
+      "index": 25,
+      "event": {
+        "id": "lis-25",
+        "phase": "skip",
+        "label": "Skip a[1] as a predecessor",
+        "detail": "a[1] = 22 is not smaller than 21, so this pair cannot be increasing.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:4"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 4
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:4"
+      ]
+    },
+    {
+      "index": 26,
+      "event": {
+        "id": "lis-26",
+        "phase": "compare",
+        "label": "Compare a[2] with a[4]",
+        "detail": "Check whether a[2] = 9 can precede a[4] = 21.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:4"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 4
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:4"
+      ]
+    },
+    {
+      "index": 27,
+      "event": {
+        "id": "lis-27",
+        "phase": "skip",
+        "label": "Keep dp[4] = 2",
+        "detail": "a[2] < a[4], but dp[2] + 1 = 2 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:4"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 4
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:4"
+      ]
+    },
+    {
+      "index": 28,
+      "event": {
+        "id": "lis-28",
+        "phase": "compare",
+        "label": "Compare a[3] with a[4]",
+        "detail": "Check whether a[3] = 33 can precede a[4] = 21.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:4"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": 3,
+        "sequence": [],
+        "activePair": {
+          "from": 3,
+          "to": 4
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:3",
+        "cell:4"
+      ]
+    },
+    {
+      "index": 29,
+      "event": {
+        "id": "lis-29",
+        "phase": "skip",
+        "label": "Skip a[3] as a predecessor",
+        "detail": "a[3] = 33 is not smaller than 21, so this pair cannot be increasing.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:4"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": 3,
+        "sequence": [],
+        "activePair": {
+          "from": 3,
+          "to": 4
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:3",
+        "cell:4"
+      ]
+    },
+    {
+      "index": 30,
+      "event": {
+        "id": "lis-30",
+        "phase": "best",
+        "label": "Best stays 3",
+        "detail": "a[4] ends a subsequence of length 2, so the global best does not change.",
+        "focus": {
+          "kind": "concept",
+          "id": "best"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 4,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "best"
+      },
+      "changedIds": [
+        "cell:4"
+      ]
+    },
+    {
+      "index": 31,
+      "event": {
+        "id": "lis-31",
+        "phase": "visit",
+        "label": "Consider a[5] = 50",
+        "detail": "Start with dp[5] = 1: the value itself is an increasing subsequence of length one.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:5"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "cell:5"
+      ]
+    },
+    {
+      "index": 32,
+      "event": {
+        "id": "lis-32",
+        "phase": "compare",
+        "label": "Compare a[0] with a[5]",
+        "detail": "Check whether a[0] = 10 can precede a[5] = 50.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:5"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          1,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 5
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:5"
+      ]
+    },
+    {
+      "index": 33,
+      "event": {
+        "id": "lis-33",
+        "phase": "update",
+        "label": "Extend from a[0] to a[5]",
+        "detail": "a[0] = 10 < 50, so dp[5] becomes max(1, dp[0] + 1) = 2.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          2,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          0,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 5
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:5",
+        "link:0-5"
+      ]
+    },
+    {
+      "index": 34,
+      "event": {
+        "id": "lis-34",
+        "phase": "compare",
+        "label": "Compare a[1] with a[5]",
+        "detail": "Check whether a[1] = 22 can precede a[5] = 50.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:5"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          2,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          0,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 5
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:5"
+      ]
+    },
+    {
+      "index": 35,
+      "event": {
+        "id": "lis-35",
+        "phase": "update",
+        "label": "Extend from a[1] to a[5]",
+        "detail": "a[1] = 22 < 50, so dp[5] becomes max(2, dp[1] + 1) = 3.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          3,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          1,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 5
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:5",
+        "link:1-5"
+      ]
+    },
+    {
+      "index": 36,
+      "event": {
+        "id": "lis-36",
+        "phase": "compare",
+        "label": "Compare a[2] with a[5]",
+        "detail": "Check whether a[2] = 9 can precede a[5] = 50.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:5"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          3,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          1,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 5
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:5"
+      ]
+    },
+    {
+      "index": 37,
+      "event": {
+        "id": "lis-37",
+        "phase": "skip",
+        "label": "Keep dp[5] = 3",
+        "detail": "a[2] < a[5], but dp[2] + 1 = 2 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:5"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          3,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          1,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 5
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:5"
+      ]
+    },
+    {
+      "index": 38,
+      "event": {
+        "id": "lis-38",
+        "phase": "compare",
+        "label": "Compare a[3] with a[5]",
+        "detail": "Check whether a[3] = 33 can precede a[5] = 50.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:5"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          3,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          1,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 3,
+        "sequence": [],
+        "activePair": {
+          "from": 3,
+          "to": 5
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:3",
+        "cell:5"
+      ]
+    },
+    {
+      "index": 39,
+      "event": {
+        "id": "lis-39",
+        "phase": "update",
+        "label": "Extend from a[3] to a[5]",
+        "detail": "a[3] = 33 < 50, so dp[5] becomes max(3, dp[3] + 1) = 4.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 3,
+        "sequence": [],
+        "activePair": {
+          "from": 3,
+          "to": 5
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:3",
+        "cell:5",
+        "link:3-5"
+      ]
+    },
+    {
+      "index": 40,
+      "event": {
+        "id": "lis-40",
+        "phase": "compare",
+        "label": "Compare a[4] with a[5]",
+        "detail": "Check whether a[4] = 21 can precede a[5] = 50.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:5"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 4,
+        "sequence": [],
+        "activePair": {
+          "from": 4,
+          "to": 5
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:4",
+        "cell:5"
+      ]
+    },
+    {
+      "index": 41,
+      "event": {
+        "id": "lis-41",
+        "phase": "skip",
+        "label": "Keep dp[5] = 4",
+        "detail": "a[4] < a[5], but dp[4] + 1 = 3 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:5"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          null,
+          null
+        ],
+        "bestIndex": 3,
+        "currentIndex": 5,
+        "compareIndex": 4,
+        "sequence": [],
+        "activePair": {
+          "from": 4,
+          "to": 5
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:4",
+        "cell:5"
+      ]
+    },
+    {
+      "index": 42,
+      "event": {
+        "id": "lis-42",
+        "phase": "best",
+        "label": "Best length is 4",
+        "detail": "The longest subsequence found so far ends at a[5] = 50.",
+        "focus": {
+          "kind": "concept",
+          "id": "best"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          null,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 5,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "best"
+      },
+      "changedIds": [
+        "cell:5"
+      ]
+    },
+    {
+      "index": 43,
+      "event": {
+        "id": "lis-43",
+        "phase": "visit",
+        "label": "Consider a[6] = 41",
+        "detail": "Start with dp[6] = 1: the value itself is an increasing subsequence of length one.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          null,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "cell:6"
+      ]
+    },
+    {
+      "index": 44,
+      "event": {
+        "id": "lis-44",
+        "phase": "compare",
+        "label": "Compare a[0] with a[6]",
+        "detail": "Check whether a[0] = 10 can precede a[6] = 41.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          1,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          null,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 6
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 45,
+      "event": {
+        "id": "lis-45",
+        "phase": "update",
+        "label": "Extend from a[0] to a[6]",
+        "detail": "a[0] = 10 < 41, so dp[6] becomes max(1, dp[0] + 1) = 2.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          2,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          0,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 6
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:6",
+        "link:0-6"
+      ]
+    },
+    {
+      "index": 46,
+      "event": {
+        "id": "lis-46",
+        "phase": "compare",
+        "label": "Compare a[1] with a[6]",
+        "detail": "Check whether a[1] = 22 can precede a[6] = 41.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          2,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          0,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 6
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 47,
+      "event": {
+        "id": "lis-47",
+        "phase": "update",
+        "label": "Extend from a[1] to a[6]",
+        "detail": "a[1] = 22 < 41, so dp[6] becomes max(2, dp[1] + 1) = 3.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          3,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          1,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 6
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:6",
+        "link:1-6"
+      ]
+    },
+    {
+      "index": 48,
+      "event": {
+        "id": "lis-48",
+        "phase": "compare",
+        "label": "Compare a[2] with a[6]",
+        "detail": "Check whether a[2] = 9 can precede a[6] = 41.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          3,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          1,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 6
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 49,
+      "event": {
+        "id": "lis-49",
+        "phase": "skip",
+        "label": "Keep dp[6] = 3",
+        "detail": "a[2] < a[6], but dp[2] + 1 = 2 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          3,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          1,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 6
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 50,
+      "event": {
+        "id": "lis-50",
+        "phase": "compare",
+        "label": "Compare a[3] with a[6]",
+        "detail": "Check whether a[3] = 33 can precede a[6] = 41.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          3,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          1,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 3,
+        "sequence": [],
+        "activePair": {
+          "from": 3,
+          "to": 6
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:3",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 51,
+      "event": {
+        "id": "lis-51",
+        "phase": "update",
+        "label": "Extend from a[3] to a[6]",
+        "detail": "a[3] = 33 < 41, so dp[6] becomes max(3, dp[3] + 1) = 4.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 3,
+        "sequence": [],
+        "activePair": {
+          "from": 3,
+          "to": 6
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:3",
+        "cell:6",
+        "link:3-6"
+      ]
+    },
+    {
+      "index": 52,
+      "event": {
+        "id": "lis-52",
+        "phase": "compare",
+        "label": "Compare a[4] with a[6]",
+        "detail": "Check whether a[4] = 21 can precede a[6] = 41.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 4,
+        "sequence": [],
+        "activePair": {
+          "from": 4,
+          "to": 6
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:4",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 53,
+      "event": {
+        "id": "lis-53",
+        "phase": "skip",
+        "label": "Keep dp[6] = 4",
+        "detail": "a[4] < a[6], but dp[4] + 1 = 3 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 4,
+        "sequence": [],
+        "activePair": {
+          "from": 4,
+          "to": 6
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:4",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 54,
+      "event": {
+        "id": "lis-54",
+        "phase": "compare",
+        "label": "Compare a[5] with a[6]",
+        "detail": "Check whether a[5] = 50 can precede a[6] = 41.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 5,
+        "sequence": [],
+        "activePair": {
+          "from": 5,
+          "to": 6
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:5",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 55,
+      "event": {
+        "id": "lis-55",
+        "phase": "skip",
+        "label": "Skip a[5] as a predecessor",
+        "detail": "a[5] = 50 is not smaller than 41, so this pair cannot be increasing.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:6"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": 5,
+        "sequence": [],
+        "activePair": {
+          "from": 5,
+          "to": 6
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:5",
+        "cell:6"
+      ]
+    },
+    {
+      "index": 56,
+      "event": {
+        "id": "lis-56",
+        "phase": "best",
+        "label": "Best stays 4",
+        "detail": "a[6] ends a subsequence of length 4, so the global best does not change.",
+        "focus": {
+          "kind": "concept",
+          "id": "best"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 6,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "best"
+      },
+      "changedIds": [
+        "cell:6"
+      ]
+    },
+    {
+      "index": 57,
+      "event": {
+        "id": "lis-57",
+        "phase": "visit",
+        "label": "Consider a[7] = 60",
+        "detail": "Start with dp[7] = 1: the value itself is an increasing subsequence of length one.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "visit"
+      },
+      "changedIds": [
+        "cell:7"
+      ]
+    },
+    {
+      "index": 58,
+      "event": {
+        "id": "lis-58",
+        "phase": "compare",
+        "label": "Compare a[0] with a[7]",
+        "detail": "Check whether a[0] = 10 can precede a[7] = 60.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          1
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          null
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 7
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 59,
+      "event": {
+        "id": "lis-59",
+        "phase": "update",
+        "label": "Extend from a[0] to a[7]",
+        "detail": "a[0] = 10 < 60, so dp[7] becomes max(1, dp[0] + 1) = 2.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          2
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          0
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 0,
+        "sequence": [],
+        "activePair": {
+          "from": 0,
+          "to": 7
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:7",
+        "link:0-7"
+      ]
+    },
+    {
+      "index": 60,
+      "event": {
+        "id": "lis-60",
+        "phase": "compare",
+        "label": "Compare a[1] with a[7]",
+        "detail": "Check whether a[1] = 22 can precede a[7] = 60.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          2
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          0
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 7
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 61,
+      "event": {
+        "id": "lis-61",
+        "phase": "update",
+        "label": "Extend from a[1] to a[7]",
+        "detail": "a[1] = 22 < 60, so dp[7] becomes max(2, dp[1] + 1) = 3.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          3
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          1
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 1,
+        "sequence": [],
+        "activePair": {
+          "from": 1,
+          "to": 7
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:1",
+        "cell:7",
+        "link:1-7"
+      ]
+    },
+    {
+      "index": 62,
+      "event": {
+        "id": "lis-62",
+        "phase": "compare",
+        "label": "Compare a[2] with a[7]",
+        "detail": "Check whether a[2] = 9 can precede a[7] = 60.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          3
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          1
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 7
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 63,
+      "event": {
+        "id": "lis-63",
+        "phase": "skip",
+        "label": "Keep dp[7] = 3",
+        "detail": "a[2] < a[7], but dp[2] + 1 = 2 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          3
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          1
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 2,
+        "sequence": [],
+        "activePair": {
+          "from": 2,
+          "to": 7
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:2",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 64,
+      "event": {
+        "id": "lis-64",
+        "phase": "compare",
+        "label": "Compare a[3] with a[7]",
+        "detail": "Check whether a[3] = 33 can precede a[7] = 60.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          3
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          1
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 3,
+        "sequence": [],
+        "activePair": {
+          "from": 3,
+          "to": 7
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:3",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 65,
+      "event": {
+        "id": "lis-65",
+        "phase": "update",
+        "label": "Extend from a[3] to a[7]",
+        "detail": "a[3] = 33 < 60, so dp[7] becomes max(3, dp[3] + 1) = 4.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          4
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          3
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 3,
+        "sequence": [],
+        "activePair": {
+          "from": 3,
+          "to": 7
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:3",
+        "cell:7",
+        "link:3-7"
+      ]
+    },
+    {
+      "index": 66,
+      "event": {
+        "id": "lis-66",
+        "phase": "compare",
+        "label": "Compare a[4] with a[7]",
+        "detail": "Check whether a[4] = 21 can precede a[7] = 60.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          4
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          3
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 4,
+        "sequence": [],
+        "activePair": {
+          "from": 4,
+          "to": 7
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:4",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 67,
+      "event": {
+        "id": "lis-67",
+        "phase": "skip",
+        "label": "Keep dp[7] = 4",
+        "detail": "a[4] < a[7], but dp[4] + 1 = 3 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          4
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          3
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 4,
+        "sequence": [],
+        "activePair": {
+          "from": 4,
+          "to": 7
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:4",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 68,
+      "event": {
+        "id": "lis-68",
+        "phase": "compare",
+        "label": "Compare a[5] with a[7]",
+        "detail": "Check whether a[5] = 50 can precede a[7] = 60.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          4
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          3
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 5,
+        "sequence": [],
+        "activePair": {
+          "from": 5,
+          "to": 7
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:5",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 69,
+      "event": {
+        "id": "lis-69",
+        "phase": "update",
+        "label": "Extend from a[5] to a[7]",
+        "detail": "a[5] = 50 < 60, so dp[7] becomes max(4, dp[5] + 1) = 5.",
+        "focus": {
+          "kind": "concept",
+          "id": "predecessor"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 5,
+        "sequence": [],
+        "activePair": {
+          "from": 5,
+          "to": 7
+        },
+        "phase": "update"
+      },
+      "changedIds": [
+        "cell:5",
+        "cell:7",
+        "link:5-7"
+      ]
+    },
+    {
+      "index": 70,
+      "event": {
+        "id": "lis-70",
+        "phase": "compare",
+        "label": "Compare a[6] with a[7]",
+        "detail": "Check whether a[6] = 41 can precede a[7] = 60.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 6,
+        "sequence": [],
+        "activePair": {
+          "from": 6,
+          "to": 7
+        },
+        "phase": "compare"
+      },
+      "changedIds": [
+        "cell:6",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 71,
+      "event": {
+        "id": "lis-71",
+        "phase": "skip",
+        "label": "Keep dp[7] = 5",
+        "detail": "a[6] < a[7], but dp[6] + 1 = 5 does not improve the current value.",
+        "focus": {
+          "kind": "entity",
+          "id": "cell:7"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 5,
+        "currentIndex": 7,
+        "compareIndex": 6,
+        "sequence": [],
+        "activePair": {
+          "from": 6,
+          "to": 7
+        },
+        "phase": "skip"
+      },
+      "changedIds": [
+        "cell:6",
+        "cell:7"
+      ]
+    },
+    {
+      "index": 72,
+      "event": {
+        "id": "lis-72",
+        "phase": "best",
+        "label": "Best length is 5",
+        "detail": "The longest subsequence found so far ends at a[7] = 60.",
+        "focus": {
+          "kind": "concept",
+          "id": "best"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 7,
+        "currentIndex": 7,
+        "compareIndex": null,
+        "sequence": [],
+        "activePair": null,
+        "phase": "best"
+      },
+      "changedIds": [
+        "cell:7"
+      ]
+    },
+    {
+      "index": 73,
+      "event": {
+        "id": "lis-73",
+        "phase": "reconstruct",
+        "label": "Select a[7] = 60",
+        "detail": "Follow prev[7] to reconstruct one longest increasing subsequence.",
+        "focus": {
+          "kind": "concept",
+          "id": "reconstruct"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 7,
+        "currentIndex": 7,
+        "compareIndex": null,
+        "sequence": [
+          7
+        ],
+        "activePair": null,
+        "phase": "reconstruct"
+      },
+      "changedIds": [
+        "cell:7"
+      ]
+    },
+    {
+      "index": 74,
+      "event": {
+        "id": "lis-74",
+        "phase": "reconstruct",
+        "label": "Select a[5] = 50",
+        "detail": "Follow prev[5] to reconstruct one longest increasing subsequence.",
+        "focus": {
+          "kind": "concept",
+          "id": "reconstruct"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 7,
+        "currentIndex": 5,
+        "compareIndex": null,
+        "sequence": [
+          5,
+          7
+        ],
+        "activePair": null,
+        "phase": "reconstruct"
+      },
+      "changedIds": [
+        "cell:5"
+      ]
+    },
+    {
+      "index": 75,
+      "event": {
+        "id": "lis-75",
+        "phase": "reconstruct",
+        "label": "Select a[3] = 33",
+        "detail": "Follow prev[3] to reconstruct one longest increasing subsequence.",
+        "focus": {
+          "kind": "concept",
+          "id": "reconstruct"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 7,
+        "currentIndex": 3,
+        "compareIndex": null,
+        "sequence": [
+          3,
+          5,
+          7
+        ],
+        "activePair": null,
+        "phase": "reconstruct"
+      },
+      "changedIds": [
+        "cell:3"
+      ]
+    },
+    {
+      "index": 76,
+      "event": {
+        "id": "lis-76",
+        "phase": "reconstruct",
+        "label": "Select a[1] = 22",
+        "detail": "Follow prev[1] to reconstruct one longest increasing subsequence.",
+        "focus": {
+          "kind": "concept",
+          "id": "reconstruct"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 7,
+        "currentIndex": 1,
+        "compareIndex": null,
+        "sequence": [
+          1,
+          3,
+          5,
+          7
+        ],
+        "activePair": null,
+        "phase": "reconstruct"
+      },
+      "changedIds": [
+        "cell:1"
+      ]
+    },
+    {
+      "index": 77,
+      "event": {
+        "id": "lis-77",
+        "phase": "reconstruct",
+        "label": "Select a[0] = 10",
+        "detail": "Follow prev[0] to reconstruct one longest increasing subsequence.",
+        "focus": {
+          "kind": "concept",
+          "id": "reconstruct"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 7,
+        "currentIndex": 0,
+        "compareIndex": null,
+        "sequence": [
+          0,
+          1,
+          3,
+          5,
+          7
+        ],
+        "activePair": null,
+        "phase": "reconstruct"
+      },
+      "changedIds": [
+        "cell:0"
+      ]
+    },
+    {
+      "index": 78,
+      "event": {
+        "id": "lis-78",
+        "phase": "done",
+        "label": "Complete: length 5",
+        "detail": "The reconstructed subsequence is [10, 22, 33, 50, 60]. The O(n²) dynamic program is complete.",
+        "focus": {
+          "kind": "concept",
+          "id": "reconstruct"
+        }
+      },
+      "state": {
+        "values": [
+          10,
+          22,
+          9,
+          33,
+          21,
+          50,
+          41,
+          60
+        ],
+        "dp": [
+          1,
+          2,
+          1,
+          3,
+          2,
+          4,
+          4,
+          5
+        ],
+        "prev": [
+          null,
+          0,
+          null,
+          1,
+          0,
+          3,
+          3,
+          5
+        ],
+        "bestIndex": 7,
+        "currentIndex": null,
+        "compareIndex": null,
+        "sequence": [
+          0,
+          1,
+          3,
+          5,
+          7
+        ],
+        "activePair": null,
+        "phase": "done"
+      },
+      "changedIds": [
+        "cell:0",
+        "cell:1",
+        "cell:3",
+        "cell:5",
+        "cell:7"
+      ]
+    }
+  ]
+}

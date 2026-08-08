@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types --test tests/tarjan.test.mjs",
+    "test": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types scripts/verify-lis-artifact.mjs && node --experimental-strip-types --test tests/tarjan.test.mjs tests/lis.test.mjs",
     "generate:tarjan": "node --experimental-strip-types scripts/generate-tarjan-artifact.mjs",
+    "generate:lis": "node --experimental-strip-types scripts/generate-lis-artifact.mjs",
     "verify:tarjan": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs",
+    "verify:lis": "node --experimental-strip-types scripts/verify-lis-artifact.mjs",
     "patch:excalidraw-tools": "node scripts/patch-excalidraw-tools.mjs",
     "vendor:excalidraw": "node scripts/vendor-excalidraw.mjs"
   },

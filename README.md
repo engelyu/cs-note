@@ -2,7 +2,7 @@
 
 CS Note is an English-first computer science teaching site built around a visual execution debugger. Algorithms are authored locally, validated in CI, and published as deterministic semantic artifacts that the site can replay through Excalidraw and debugger panels.
 
-The first vertical slice is Tarjan's strongly connected components algorithm. It currently uses a deterministic semantic trace so the runtime contract can be tested before the GDB/MI adapter is added. LIS is the next validation slice for sequence and dynamic-programming views.
+The first two vertical slices are Tarjan's strongly connected components algorithm and Longest Increasing Subsequence. Both use deterministic semantic traces so the runtime contract can be tested before the GDB/MI adapter is added. Tarjan exercises graph, recursion, low-link, and SCC concepts; LIS exercises sequence, dynamic programming, predecessor links, and reconstruction.
 
 ## Development
 
