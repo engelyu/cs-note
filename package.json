@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types --test tests/tarjan.test.mjs",
     "generate:tarjan": "node --experimental-strip-types scripts/generate-tarjan-artifact.mjs",
-    "verify:tarjan": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs"
+    "verify:tarjan": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs",
+    "patch:excalidraw-tools": "node scripts/patch-excalidraw-tools.mjs"
   },
   "dependencies": {
     "react": "19.2.8",

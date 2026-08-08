@@ -88,4 +88,4 @@ button:focus-visible { outline: 2px solid #79b8ff; outline-offset: 2px; }
 .table-head, .variable-row { grid-template-columns: 1.25fr .55fr .55fr .65fr 1fr; }
 .variable-row small { overflow: hidden; color: #73b8a6; font: 8px ui-monospace, monospace; text-overflow: ellipsis; white-space: nowrap; }
 .transport-controls button:disabled { cursor: default; opacity: .6; }
-.excalidraw-host .App-toolbar, .excalidraw-host .App-menu_top, .excalidraw-host .App-menu_bottom { display: none !important; }
+.excalidraw-host.canvas-input-disabled .App-toolbar, .excalidraw-host.canvas-input-disabled .App-menu_top, .excalidraw-host.canvas-input-disabled .App-menu_bottom { display: none !important; }

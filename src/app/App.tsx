@@ -54,6 +54,23 @@ const panelIds = tarjanPackage.views
   .map((view) => view.id)
   .filter((id): id is PanelId => ["variables", "call-stack", "concepts", "timeline"].includes(id));
 
+const layoutOnlyTools = {
+  selection: true,
+  hand: true,
+  rectangle: false,
+  diamond: false,
+  ellipse: false,
+  arrow: false,
+  line: false,
+  freedraw: false,
+  text: false,
+  image: false,
+  eraser: false,
+  frame: false,
+  embeddable: false,
+  laser: false,
+};
+
 export function App() {
   const [step, setStep] = useState(0);
   const [panel, setPanel] = useState<PanelId>(panelIds[0] ?? "variables");
@@ -98,6 +115,11 @@ export function App() {
     }
   };
 
+  const advanceTrace = () => {
+    if (step < frames.length - 1) changeStep(step + 1);
+    else if (capabilities.rerun) changeStep(0);
+  };
+
   const componentSummary = frame.state.components.map((component) => `{${component.map((member) => frame.state.labels[member]).join(", ")}}`).join(" · ") || "—";
 
   return (
@@ -140,29 +162,14 @@ export function App() {
           <section className="canvas-frame" aria-label="Algorithm canvas">
             <div className="canvas-grid" />
             <div className="canvas-breadcrumb"><span className="live-dot" /> <span>GRAPH / TARJAN-SCC</span><b>FRAME {String(step + 1).padStart(2, "0")}</b></div>
-            <div className="excalidraw-host">
+            <div className={`excalidraw-host ${capabilities.editInput ? "canvas-input-enabled" : "canvas-input-disabled"}`}>
               <Excalidraw
                 initialData={{ elements, appState: { viewBackgroundColor: "#17191f" } }}
                 theme="dark"
                 excalidrawAPI={(api: unknown) => { apiRef.current = api as ExcalidrawApi; }}
                 onChange={capabilities.editLayout ? handleCanvasChange : undefined}
                 UIOptions={{
-                  tools: {
-                    selection: true,
-                    hand: true,
-                    rectangle: false,
-                    diamond: false,
-                    ellipse: false,
-                    arrow: false,
-                    line: false,
-                    freedraw: false,
-                    text: false,
-                    image: false,
-                    eraser: false,
-                    frame: false,
-                    embeddable: false,
-                    laser: false,
-                  },
+                  tools: capabilities.editInput ? undefined : layoutOnlyTools,
                   canvasActions: {
                     changeViewBackgroundColor: false,
                     clearCanvas: false,
@@ -188,7 +195,7 @@ export function App() {
           <section className="transport-panel">
             <div className="transport-top"><span>EXECUTION TRACE</span><small>{step + 1} / {frames.length} events</small></div>
             <div className="transport-track"><div className="track-line"><i style={{ width: `${(step / Math.max(1, frames.length - 1)) * 100}%` }} /></div>{frames.map((candidate, index) => <button key={candidate.event.id} className={index <= step ? "done" : ""} onClick={() => changeStep(index)} aria-label={`Go to event ${index + 1}`} />)}</div>
-            <div className="transport-controls"><button onClick={() => changeStep(step - 1)} aria-label="Previous event">←</button><button className="play-button" onClick={() => { if (step < frames.length - 1) changeStep(step + 1); }} disabled={step === frames.length - 1 && !capabilities.rerun} aria-label={step === frames.length - 1 ? "Trace complete" : "Next event"}>{step === frames.length - 1 ? "✓" : "▶"}</button><button onClick={() => changeStep(step + 1)} aria-label="Next event">→</button><span className="key-hint"><kbd>←</kbd><kbd>→</kbd> STEP</span></div>
+            <div className="transport-controls"><button onClick={() => changeStep(step - 1)} aria-label="Previous event">←</button><button className="play-button" onClick={advanceTrace} disabled={step === frames.length - 1 && !capabilities.rerun} aria-label={step === frames.length - 1 ? (capabilities.rerun ? "Rerun trace" : "Trace complete") : "Next event"}>{step === frames.length - 1 ? (capabilities.rerun ? "↺" : "✓") : "▶"}</button><button onClick={() => changeStep(step + 1)} aria-label="Next event">→</button><span className="key-hint"><kbd>←</kbd><kbd>→</kbd> STEP</span></div>
           </section>
         </main>
 
