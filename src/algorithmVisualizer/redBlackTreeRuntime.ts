@@ -16,6 +16,6 @@ if (algorithmVisualizerRedBlackTreeFrames.length === 0 || algorithmVisualizerRed
 export const algorithmVisualizerRedBlackTree = {
   id: "algorithm-visualizer-red-black-tree",
   title: "Red-Black Tree",
-  description: "An original CS Note command trace based on the standard red-black insertion fix-up sequence.",
+  description: "An original Algor Note command trace based on the standard red-black insertion fix-up sequence.",
   frames: algorithmVisualizerRedBlackTreeFrames,
 };

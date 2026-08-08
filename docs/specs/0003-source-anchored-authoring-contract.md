@@ -1,8 +1,10 @@
 # Source-Anchored Authoring Contract
 
+Status: Deferred; see ADR 0005. This is a future authoring design, not part of the current runtime MVP.
+
 ## Purpose
 
-This specification defines the smallest authoring contract for a Contributor who wants to turn a C++ algorithm into a CS Note visualization. The Contributor supplies source code, source-anchored Record Points, explicitly named input fields, and a Semantic Model that maps each captured frame to logical state.
+This specification defines the smallest authoring contract for a Contributor who wants to turn a C++ algorithm into a Algor Note visualization. The Contributor supplies source code, source-anchored Record Points, explicitly named input fields, and a Semantic Model that maps each captured frame to logical state.
 
 The contract intentionally follows the familiar debugger workflow. Execution remains linear, Record Points define the replay timeline, and the Semantic Model does not discover variables, scan scopes, or create new frame boundaries.
 

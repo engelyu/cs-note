@@ -150,16 +150,31 @@ test("Red-Black Tree artifact replays rotations, colors, and stable tree identit
     [[20, 10], [10, 15], [27, 25], [20, 27], [27, 30], [10, 5]],
   );
 
-  const selected = projectAlgorithmVisualizerSelection(frames[9].graph, { "node:27": true });
+  const selected = projectAlgorithmVisualizerSelection(frames[9].graph, { "node:number:27": true });
   assert.deepEqual(selected, {
-    elementId: "node:27",
+    elementId: "node:number:27",
     kind: "node",
     label: "27",
     detail: "red · visited 0 · selected 1",
   });
 
   const redNode = createAlgorithmVisualizerGraphSkeletons(finalGraph, {})
-    .find((element) => element.id === "node:30");
+    .find((element) => element.id === "node:number:30");
   assert.equal(redNode.backgroundColor, "#762b39");
   assert.equal(redNode.customData.color, "red");
+});
+
+test("typed graph ids remain distinct in the canvas projection", () => {
+  const mixed = replayAlgorithmVisualizerCommands([
+    { key: "graph", method: "GraphTracer", args: ["Mixed ids"] },
+    { key: "graph", method: "addNode", args: [1, null, 100, 100] },
+    { key: "graph", method: "addNode", args: ["1", null, 300, 100] },
+  ]);
+  const graph = mixed[0].graph;
+  assert.ok(graph);
+  const elements = createAlgorithmVisualizerGraphSkeletons(graph, {});
+  assert.deepEqual(elements.filter((element) => element.type === "ellipse").map((element) => element.id), [
+    "node:number:1",
+    "node:1",
+  ]);
 });

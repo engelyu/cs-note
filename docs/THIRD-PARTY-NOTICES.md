@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-CS Note has not selected a license for its own source code yet. Nothing in this file grants a license to CS Note source code; it records the third-party software and assets that are redistributed by the repository.
+Algor Note has not selected a license for its own source code yet. Nothing in this file grants a license to Algor Note source code; it records the third-party software and assets that are redistributed by the repository.
 
 ## Vendored Excalidraw runtime
 
@@ -16,13 +16,13 @@ The generated `vendor/excalidraw/excalidraw.js` bundle retains the upstream bund
 
 ## Algorithm Visualizer compatibility
 
-CS Note currently contains an original Algorithm Visualizer-compatible command fixture under `src/algorithmVisualizer/`; it does not vendor or copy Algorithm Visualizer source code. The command shape and replay behavior are compatible with the public project, but compatibility does not grant permission to redistribute upstream algorithm or tracer source files.
+Algor Note currently contains an original Algorithm Visualizer-compatible command fixture under `src/algorithmVisualizer/`; it does not vendor or copy Algorithm Visualizer source code. The command shape and replay behavior are compatible with the public project, but compatibility does not grant permission to redistribute upstream algorithm or tracer source files.
 
 The main Algorithm Visualizer web repository publishes an MIT license. The separate `algorithm-visualizer/algorithms` and `algorithm-visualizer/tracers.cpp` repositories must be audited independently before their source files are copied into this repository. Preserve upstream attribution and license notices for any future imported content.
 
 ## Fonts
 
-The font files under `vendor/excalidraw/fonts/` are copied from the pinned Excalidraw package distribution and are not CS Note artwork. They must remain covered by the upstream font notices when the vendor package is updated. The current package distribution does not include one separate license file for every font family, so adding new font files or redistributing these fonts outside this Excalidraw integration requires a fresh per-family license audit.
+The font files under `vendor/excalidraw/fonts/` are copied from the pinned Excalidraw package distribution and are not Algor Note artwork. They must remain covered by the upstream font notices when the vendor package is updated. The current package distribution does not include one separate license file for every font family, so adding new font files or redistributing these fonts outside this Excalidraw integration requires a fresh per-family license audit.
 
 ## Direct development dependencies
 

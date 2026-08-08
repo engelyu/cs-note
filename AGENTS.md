@@ -1,4 +1,4 @@
-# CS Note Agent Instructions
+# Algor Note Agent Instructions
 
 Use complete paragraphs in user-facing responses and avoid bullet lists. Keep the product UI in English unless a task explicitly says otherwise.
 

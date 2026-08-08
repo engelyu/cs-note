@@ -11,8 +11,7 @@ import {
   type WorkbenchState,
 } from "./workbenchState";
 
-const STORAGE_KEY = "cs-note:workbench:v1";
-const LEGACY_KEYS = Array.from({ length: 7 }, (_, index) => `dsvisual:graph-scc-tarjan:board:v${index + 1}`);
+const STORAGE_KEY = "algor-note:workbench:v1";
 const TITLEBAR_H = 42;
 const STATUSBAR_H = 24;
 const ACTIVITYBAR_W = 46;
@@ -33,7 +32,6 @@ export type WorkbenchProps = {
 
 function readInitialState(): WorkbenchState {
   try {
-    for (const key of LEGACY_KEYS) localStorage.removeItem(key);
     const raw = localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : null;
     const state = sanitizeWorkbenchState(parsed);
@@ -237,7 +235,7 @@ export function Workbench({ title, algorithmLabel, primary, editor, secondary, p
       }}
     >
       <header className="wb-titlebar" data-wb-part="titleBar">
-        <div className="wb-brand"><span className="wb-brand-mark">▦</span><span>CS Note</span><b>/</b><strong>{title}</strong><em>LEARNING</em></div>
+        <div className="wb-brand"><span className="wb-brand-mark">▦</span><span>Algor Note</span><b>/</b><strong>{title}</strong><em>LEARNING</em></div>
         <div className="wb-titlebar-controls">
           <button className={`wb-title-btn ${menuOpen ? "on" : ""}`} type="button" data-wb-menu-open="true" title="Customize Layout" aria-label="Customize Layout" onClick={() => setMenuOpen((open) => !open)}>⊞</button>
           {(["primarySideBar", "panel", "secondarySideBar"] as const).map((part) => <button key={part} className={`wb-title-btn ${state.visible[part] ? "on" : ""}`} type="button" data-wb-toggle={part} aria-pressed={state.visible[part]} title={`Toggle ${partLabel(part)}`} onClick={() => setVisible(part, !state.visible[part])}>{toggleIcon(part)}</button>)}

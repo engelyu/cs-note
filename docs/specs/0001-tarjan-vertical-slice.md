@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-CS Note needs its first complete algorithm visualization slice. The current prototype can generate a small Tarjan strongly connected components trace and render it through Excalidraw, but the contract between algorithm execution, semantic state, debugger-style panels, Canvas presentation, and student-safe interaction is not yet formalized. Without that contract, future visualizations could accidentally make Excalidraw scene state the source of truth or expose editing actions that change a verified algorithm example.
+Algor Note needs its first complete algorithm visualization slice. The current prototype can generate a small Tarjan strongly connected components trace and render it through Excalidraw, but the contract between algorithm execution, semantic state, debugger-style panels, Canvas presentation, and student-safe interaction is not yet formalized. Without that contract, future visualizations could accidentally make Excalidraw scene state the source of truth or expose editing actions that change a verified algorithm example.
 
 The first slice must establish the reusable runtime boundary for the rest of the algorithm library. It should make Tarjan understandable as a replayable visual execution while leaving room for future locally authored debugger artifacts, additional algorithms such as LIS, and optional views that do not belong on the Canvas.
 
@@ -16,7 +16,7 @@ The first implementation may use a deterministic local Tarjan generator to produ
 
 ## User Stories
 
-1. As a student, I want to open Tarjan's strongly connected components algorithm in the Algorithms area, so that I can study a complete example in the same debugger-like workbench used by the rest of CS Note.
+1. As a student, I want to open Tarjan's strongly connected components algorithm in the Algorithms area, so that I can study a complete example in the same debugger-like workbench used by the rest of Algor Note.
 2. As a student, I want to choose the named "The simplest cycle" Scenario, so that I can understand the algorithm on a graph small enough to follow by hand.
 3. As a student, I want to see the current frame number and event count, so that I know where I am in the Execution Session.
 4. As a student, I want to step forward and backward through the Execution Frames, so that I can inspect each decision instead of watching an opaque animation.
@@ -54,7 +54,7 @@ The first implementation may use a deterministic local Tarjan generator to produ
 8. The Scenario capability declaration enables view toggling and Canvas Layout editing while disabling input editing and rerunning for the curated Tarjan Scenario. The Student Runtime must honor those capabilities rather than infer permissions from the presence of a view.
 9. The runtime consumes a compact static Semantic Artifact. The deterministic generator is an authoring-time stand-in for a future debugger or verifier and must not become a requirement for Student Runtime deployment.
 10. Debugger integration, C++ execution, GDB/MI transport, AST analysis, LLM semantic inference, arbitrary user-built inputs, and runtime reruns are future seams. The artifact contract must leave room for them without implementing them in this vertical slice.
-11. The workbench keeps the VS Code-like shell and English UI direction from the prototype while dropping the outer application identity and unrelated legacy site structure. The product is the independent CS Note repository, not an extension of the original dsvisual application.
+11. The workbench keeps the VS Code-like shell and English UI direction from the prototype while dropping the outer application identity and unrelated legacy site structure. The product is the independent Algor Note repository, not an extension of the original dsvisual application.
 12. The visualization authoring model is repository-based. Contributors change clearly defined Visualization Package data and generators locally, validate their artifacts, and submit pull requests. The Student Runtime is not an online contributor editor.
 
 ## Testing Decisions

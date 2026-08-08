@@ -16,7 +16,7 @@ Recreating that behavior inside every visualization would duplicate layout state
 
 Feature screens provide four slots through the Workbench interface: Primary Side Bar content, Editor content, Secondary Side Bar content, and Panel content. The shell is algorithm-agnostic. For the current visualizations, Excalidraw remains inside the Editor slot, inspector views remain inside the Secondary Side Bar slot, and the execution transport remains inside the bottom Panel slot.
 
-The layout uses CSS Grid for geometry. JavaScript owns only semantic state and writes grid tracks or data attributes; it does not maintain a second rectangle layout. The Editor is never allowed to collapse. A sidebar or Panel may be collapsed by toggling visibility or by dragging its boundary below the historical minimum threshold. Layout preferences are persisted under `cs-note:workbench:v1`.
+The layout uses CSS Grid for geometry. JavaScript owns only semantic state and writes grid tracks or data attributes; it does not maintain a second rectangle layout. The Editor is never allowed to collapse. A sidebar or Panel may be collapsed by toggling visibility or by dragging its boundary below the historical minimum threshold. Layout preferences are persisted under `algor-note:workbench:v1`.
 
 The historical `dsvisual` workbench is the behavioral reference, but the implementation is a typed React adapter rather than a direct copy of its vanilla DOM module. This keeps the seam small while matching the established layout contract.
 

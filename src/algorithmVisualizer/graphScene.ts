@@ -67,11 +67,15 @@ function sceneSignature(element: AlgorithmVisualizerCanvasElement, fields: reado
 }
 
 function nodeId(value: string | number): string {
+  return typeof value === "number" ? `number:${value}` : value;
+}
+
+function displayNodeId(value: string | number): string {
   return String(value);
 }
 
 function nodeLabel(node: AlgorithmVisualizerGraphState["nodes"][number]): string {
-  return node.weight === null || node.weight === undefined ? nodeId(node.id) : String(node.weight);
+  return node.weight === null || node.weight === undefined ? displayNodeId(node.id) : String(node.weight);
 }
 
 function nodeKey(value: string | number): string {
@@ -109,7 +113,7 @@ export function projectAlgorithmVisualizerSelection(
   return {
     elementId,
     kind: "edge",
-    label: `${nodeId(edge.source)} → ${nodeId(edge.target)}`,
+    label: `${displayNodeId(edge.source)} → ${displayNodeId(edge.target)}`,
     detail: `visited ${edge.visitedCount} · selected ${edge.selectedCount}`,
   };
 }

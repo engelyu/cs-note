@@ -4,9 +4,9 @@ Status: Accepted
 
 ## Purpose
 
-CS Note uses an Algorithm Visualizer-compatible tracer command stream as the first execution source for imported algorithm visualizations. The imported artifact is replayed into deterministic frames, then projected into the Excalidraw canvas and optional teaching panels.
+Algor Note uses an Algorithm Visualizer-compatible tracer command stream as the first execution source for imported algorithm visualizations. The imported artifact is replayed into deterministic frames, then projected into the Excalidraw canvas and optional teaching panels.
 
-This keeps the execution source of truth in the algorithm artifact while leaving the presentation layer open for CS Note-specific work. The first vertical slice proves the boundary with a small depth-first-search command fixture.
+This keeps the execution source of truth in the algorithm artifact while leaving the presentation layer open for Algor Note-specific work. The first vertical slice proves the boundary with a small depth-first-search command fixture.
 
 ## Input contract
 

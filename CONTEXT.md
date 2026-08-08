@@ -1,6 +1,6 @@
-# CS Note
+# Algor Note
 
-CS Note is an English-first computer science teaching site where algorithms are taught through replayable execution and multiple visual projections. The current focus is algorithm visualization; the model is intentionally shaped so later subjects can add their own execution sources without changing the student-facing runtime.
+Algor Note is an English-first computer science teaching site where algorithms are taught through replayable execution and multiple visual projections. The current focus is algorithm visualization; the model is intentionally shaped so later subjects can add their own execution sources without changing the student-facing runtime.
 
 ## Product roles
 

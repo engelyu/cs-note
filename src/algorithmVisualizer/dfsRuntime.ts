@@ -16,6 +16,6 @@ if (algorithmVisualizerDfsFrames.length === 0 || algorithmVisualizerDfsFrames.so
 export const algorithmVisualizerDfs = {
   id: "algorithm-visualizer-dfs",
   title: "Depth-First Search",
-  description: "An imported Algorithm Visualizer command trace rendered by the CS Note workbench.",
+  description: "An imported Algorithm Visualizer command trace rendered by the Algor Note workbench.",
   frames: algorithmVisualizerDfsFrames,
 };

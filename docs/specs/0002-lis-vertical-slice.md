@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-CS Note needs a second algorithm package that exercises sequence and dynamic-programming evidence without recursion or graph-specific state. Longest Increasing Subsequence is the next validation slice because it requires a table of derived values, predecessor relationships, a global result, and a reconstruction pass while keeping the same replayable debugger contract.
+Algor Note needs a second algorithm package that exercises sequence and dynamic-programming evidence without recursion or graph-specific state. Longest Increasing Subsequence is the next validation slice because it requires a table of derived values, predecessor relationships, a global result, and a reconstruction pass while keeping the same replayable debugger contract.
 
 ## Solution
 
