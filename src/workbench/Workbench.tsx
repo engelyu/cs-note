@@ -260,7 +260,7 @@ export function Workbench({ title, algorithmLabel, primary, editor, secondary, p
       <section className="wb-panel" data-wb-part="panel" style={{ gridColumn: `${span[0]} / ${span[1]}`, gridRow: "3 / 4" }} hidden={!state.visible.panel} ref={(element) => { partRefs.current.panel = element; }}>{panel}</section>
       <footer className="wb-statusbar" data-wb-part="statusBar" hidden={!state.visible.statusBar}><span data-wb-status="views">Primary: Scenarios · Secondary: Inspector · Panel: Execution</span><span data-wb-status="visible">Visible: {PARTS.filter((part) => state.visible[part]).map(partLabel).join(", ")}</span><span className="wb-status-end" data-wb-status="editor">{editorSize.w} × {editorSize.h} · {algorithmLabel}</span></footer>
 
-      {(["primarySideBar", "secondarySideBar", "panel"] as const).map((part) => <div key={part} className={`wb-resize ${part === "panel" ? "wb-resize-y" : "wb-resize-x"}`} data-wb-resize={part} hidden={handles[part].hidden} style={{ left: handles[part].left, top: handles[part].top, width: handles[part].width, height: handles[part].height }} onPointerDown={(event) => beginResize(part, event)} />)}
+      {(["primarySideBar", "secondarySideBar", "panel"] as const).map((part) => <div key={part} className={`wb-resize ${part === "panel" ? "wb-resize-y" : "wb-resize-x"}`} data-wb-resize={part} role="separator" aria-label={`Resize ${partLabel(part)}`} aria-orientation={part === "panel" ? "horizontal" : "vertical"} hidden={handles[part].hidden} style={{ left: handles[part].left, top: handles[part].top, width: handles[part].width, height: handles[part].height }} onPointerDown={(event) => beginResize(part, event)} />)}
     </div>
   );
 }
