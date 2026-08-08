@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { convertToStableExcalidrawElements, Excalidraw } from "../excalidraw";
 import type { LayoutRect } from "../core/types";
 import { captureTarjanLayout, createTarjanSkeletons, isTarjanSceneExact, isTarjanSceneSafe } from "../visualizations/tarjanScene";
@@ -24,6 +24,7 @@ import {
   type AlgorithmVisualizerCanvasElement,
   type AlgorithmVisualizerSelection,
 } from "../algorithmVisualizer/graphScene";
+import { Workbench } from "../workbench/Workbench";
 
 type AlgorithmId = "tarjan" | "lis" | "algorithm-visualizer-dfs" | "algorithm-visualizer-red-black-tree";
 type TarjanPanelId = "variables" | "call-stack" | "concepts" | "timeline";
@@ -63,75 +64,31 @@ function sameSelectedElementIds(left: Readonly<Record<string, boolean>>, right: 
 export function App() {
   const [algorithm, setAlgorithm] = useState<AlgorithmId>("tarjan");
   return (
-    <WorkbenchShell algorithm={algorithm} onSelect={setAlgorithm}>
-      {algorithm === "tarjan" ? <TarjanWorkbench /> : algorithm === "lis" ? <LisWorkbench /> : algorithm === "algorithm-visualizer-dfs" ? <AlgorithmVisualizerWorkbench key={algorithm} trace={algorithmVisualizerDfs} layout={ALGORITHM_VISUALIZER_LAYOUT} variant="dfs" /> : <AlgorithmVisualizerWorkbench key={algorithm} trace={algorithmVisualizerRedBlackTree} layout={RED_BLACK_TREE_LAYOUT} variant="red-black-tree" />}
-    </WorkbenchShell>
+    algorithm === "tarjan"
+      ? <TarjanWorkbench onSelect={setAlgorithm} />
+      : algorithm === "lis"
+        ? <LisWorkbench onSelect={setAlgorithm} />
+        : <AlgorithmVisualizerWorkbench key={algorithm} trace={algorithm === "algorithm-visualizer-dfs" ? algorithmVisualizerDfs : algorithmVisualizerRedBlackTree} layout={algorithm === "algorithm-visualizer-dfs" ? ALGORITHM_VISUALIZER_LAYOUT : RED_BLACK_TREE_LAYOUT} variant={algorithm === "algorithm-visualizer-dfs" ? "dfs" : "red-black-tree"} onSelect={setAlgorithm} />
   );
 }
 
-function WorkbenchShell({ algorithm, onSelect, children }: { algorithm: AlgorithmId; onSelect: (algorithm: AlgorithmId) => void; children: ReactNode }) {
-  const title = algorithm === "tarjan" ? "Tarjan's Algorithm" : algorithm === "lis" ? "Longest Increasing Subsequence" : algorithm === "algorithm-visualizer-dfs" ? algorithmVisualizerDfs.title : algorithmVisualizerRedBlackTree.title;
+function ScenarioNavigation({ algorithm, onSelect }: { algorithm: AlgorithmId; onSelect: (algorithm: AlgorithmId) => void }) {
   const imported = algorithm === "algorithm-visualizer-dfs" || algorithm === "algorithm-visualizer-red-black-tree";
-  return (
-    <div className="cs-app">
-      <header className="titlebar">
-        <div className="brand"><span className="brand-mark">▦</span><span>CS Note</span></div>
-        <div className="titlebar-path"><span>ALGORITHMS</span><b>/</b><strong>{title}</strong><em>LEARNING</em></div>
-        <div className="titlebar-actions"><button aria-label="Command palette">⌘</button><button aria-label="More options">•••</button><span className="avatar">C</span></div>
-      </header>
-
-      <div className="workbench">
-        <nav className="activitybar" aria-label="Activity bar">
-          <button className="activity active" aria-label="Scenarios"><span>◈</span></button>
-          <button className="activity" aria-label="Lessons"><span>▤</span></button>
-          <button className="activity" aria-label="Search"><span>⌕</span></button>
-          <div className="activity-spacer" />
-          <button className="activity" aria-label="Settings"><span>⚙</span></button>
-        </nav>
-
-        <aside className="primary-sidebar">
-          <div className="sidebar-heading"><span>ALGORITHMS</span><button aria-label="More algorithms">•••</button></div>
-          <p className="sidebar-subtitle">Guided algorithm traces</p>
-          <button className={`scenario-card ${algorithm === "tarjan" ? "active" : ""}`} onClick={() => onSelect("tarjan")}>
-            <span className="scenario-index">01</span>
-            <span><strong>Tarjan SCC</strong><small>Graph · {tarjanFrames.length} events</small></span>
-            <i>›</i>
-          </button>
-          <button className={`scenario-card ${algorithm === "lis" ? "active" : ""}`} onClick={() => onSelect("lis")}>
-            <span className="scenario-index lis-index">02</span>
-            <span><strong>Longest Increasing Subsequence</strong><small>Dynamic programming · {lisFrames.length} events</small></span>
-            <i>›</i>
-          </button>
-          <button className={`scenario-card ${algorithm === "algorithm-visualizer-dfs" ? "active" : ""}`} onClick={() => onSelect("algorithm-visualizer-dfs")}>
-            <span className="scenario-index av-index">03</span>
-            <span><strong>Imported DFS</strong><small>AV command trace · {algorithmVisualizerDfsFrames.length} frames</small></span>
-            <i>›</i>
-          </button>
-          <button className={`scenario-card ${algorithm === "algorithm-visualizer-red-black-tree" ? "active" : ""}`} onClick={() => onSelect("algorithm-visualizer-red-black-tree")}>
-            <span className="scenario-index rb-index">04</span>
-            <span><strong>Red-Black Tree</strong><small>AV-style trace · {algorithmVisualizerRedBlackTree.frames.length} frames</small></span>
-            <i>›</i>
-          </button>
-          <div className="sidebar-divider" />
-          <div className="sidebar-section-label">SESSION</div>
-          <div className="session-card"><span className="session-dot" /><span><strong>{imported ? "Imported trace" : "Live trace"}</strong><small>{imported ? "Algorithm Visualizer commands" : "semantic artifact · v1"}</small></span></div>
-          <div className="sidebar-note"><strong>What to watch</strong><p>{algorithm === "tarjan" ? "Low-link values travel backward through the DFS stack." : algorithm === "lis" ? "Each dp[i] records the best increasing subsequence ending here." : algorithm === "algorithm-visualizer-red-black-tree" ? "Rotations and recoloring preserve the red-black invariants." : "Tracer commands become replay frames while the graph keeps its own state."}</p></div>
-        </aside>
-
-        {children}
-      </div>
-
-      <footer className="statusbar"><span><i className="status-dot" /> CS NOTE / LOCAL ARTIFACT</span><span>{algorithm === "tarjan" ? "Tarjan SCC" : algorithm === "lis" ? "LIS dynamic programming" : algorithm === "algorithm-visualizer-red-black-tree" ? "Red-black tree command trace" : "Algorithm Visualizer command trace"} · schema v1</span><span className="status-spacer" /><span>EN</span><span>UTF-8</span></footer>
-    </div>
-  );
+  return <div className="scenario-navigation"><div className="sidebar-heading"><span>ALGORITHMS</span><button aria-label="More algorithms">•••</button></div><p className="sidebar-subtitle">Guided algorithm traces</p>
+    <button className={`scenario-card ${algorithm === "tarjan" ? "active" : ""}`} onClick={() => onSelect("tarjan")}><span className="scenario-index">01</span><span><strong>Tarjan SCC</strong><small>Graph · {tarjanFrames.length} events</small></span><i>›</i></button>
+    <button className={`scenario-card ${algorithm === "lis" ? "active" : ""}`} onClick={() => onSelect("lis")}><span className="scenario-index lis-index">02</span><span><strong>Longest Increasing Subsequence</strong><small>Dynamic programming · {lisFrames.length} events</small></span><i>›</i></button>
+    <button className={`scenario-card ${algorithm === "algorithm-visualizer-dfs" ? "active" : ""}`} onClick={() => onSelect("algorithm-visualizer-dfs")}><span className="scenario-index av-index">03</span><span><strong>Imported DFS</strong><small>AV command trace · {algorithmVisualizerDfsFrames.length} frames</small></span><i>›</i></button>
+    <button className={`scenario-card ${algorithm === "algorithm-visualizer-red-black-tree" ? "active" : ""}`} onClick={() => onSelect("algorithm-visualizer-red-black-tree")}><span className="scenario-index rb-index">04</span><span><strong>Red-Black Tree</strong><small>AV-style trace · {algorithmVisualizerRedBlackTree.frames.length} frames</small></span><i>›</i></button>
+    <div className="sidebar-divider" /><div className="sidebar-section-label">SESSION</div><div className="session-card"><span className="session-dot" /><span><strong>{imported ? "Imported trace" : "Live trace"}</strong><small>{imported ? "Algorithm Visualizer commands" : "semantic artifact · v1"}</small></span></div>
+    <div className="sidebar-note"><strong>What to watch</strong><p>{algorithm === "tarjan" ? "Low-link values travel backward through the DFS stack." : algorithm === "lis" ? "Each dp[i] records the best increasing subsequence ending here." : algorithm === "algorithm-visualizer-red-black-tree" ? "Rotations and recoloring preserve the red-black invariants." : "Tracer commands become replay frames while the graph keeps its own state."}</p></div>
+  </div>;
 }
 
-function TarjanWorkbench() {
+function TarjanWorkbench({ onSelect }: { onSelect: (algorithm: AlgorithmId) => void }) {
   const capabilities = tarjanScenario.capabilities;
   const panelIds: TarjanPanelId[] = ["variables", "call-stack", "concepts", "timeline"];
   const [step, setStep] = useState(0);
   const [panel, setPanel] = useState<TarjanPanelId>("variables");
-  const [inspectorVisible, setInspectorVisible] = useState(true);
   const [layout, setLayout] = useState<Record<string, LayoutRect>>(() => ({ ...TARJAN_LAYOUT }));
   const apiRef = useRef<ExcalidrawApi | null>(null);
   const applyingSceneRef = useRef(false);
@@ -168,21 +125,24 @@ function TarjanWorkbench() {
   };
   const componentSummary = frame.state.components.map((component) => `{${component.map((member) => frame.state.labels[member]).join(", ")}}`).join(" · ") || "—";
 
-  return (
-    <>
-      <main className="editor-shell">
-        <div className="editor-header"><div><span className="eyebrow">NOW DEBUGGING</span><h1>Tarjan's Strongly Connected Components</h1></div><div className="editor-actions"><button className="action-button">↗ <span>Open lesson</span></button><button className="action-button" onClick={() => setInspectorVisible((visible) => !visible)}>{inspectorVisible ? "Hide" : "Show"} panels</button></div></div>
+  return <Workbench
+    title="Tarjan's Strongly Connected Components"
+    algorithmLabel="Tarjan SCC"
+    primary={<ScenarioNavigation algorithm="tarjan" onSelect={onSelect} />}
+    editor={
+      <div className="editor-shell">
+        <div className="editor-header"><div><span className="eyebrow">NOW DEBUGGING</span><h1>Tarjan's Strongly Connected Components</h1></div><div className="editor-actions"><button className="action-button">↗ <span>Open lesson</span></button></div></div>
         <section className="canvas-frame" aria-label="Algorithm canvas">
           <div className="canvas-grid" /><div className="canvas-breadcrumb"><span className="live-dot" /> <span>GRAPH / TARJAN-SCC</span><b>FRAME {String(step + 1).padStart(2, "0")}</b></div>
           <div className={`excalidraw-host ${capabilities.editInput ? "canvas-input-enabled" : "canvas-input-disabled"}`}><Excalidraw initialData={{ elements, appState: { viewBackgroundColor: "#17191f" } }} theme="dark" excalidrawAPI={(api: unknown) => { apiRef.current = api as ExcalidrawApi; }} onChange={handleCanvasChange} UIOptions={{ tools: capabilities.editInput ? undefined : layoutOnlyTools, canvasActions: { changeViewBackgroundColor: false, clearCanvas: false, loadScene: false, saveToActiveFile: false, toggleTheme: false, saveAsImage: false, export: false } }} /></div>
           <div className="canvas-legend"><span><i className="legend-swatch on-stack" />On stack</span><span><i className="legend-swatch component" />SCC</span><span><i className="legend-ring" />Current</span></div><div className="canvas-hint">Only node layout edits persist; graph and algorithm edits are restored</div>
         </section>
         <ExplainStrip frame={frame} concept={projectTarjanConceptLabel(frame.state)} />
-        <TransportPanel step={step} frames={tarjanFrames} onChange={changeStep} rerun={capabilities.rerun} />
-      </main>
-      {(!capabilities.toggleView || inspectorVisible) && <aside className="secondary-sidebar"><div className="panel-tabs">{panelIds.map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "call-stack" ? `${frame.state.callStack.length} frames` : panel === "concepts" ? "4 concepts" : `${tarjanFrames.length} events`}</small></div><div className="panel-body">{panel === "variables" ? <TarjanVariablesPanel frame={frame} /> : panel === "call-stack" ? <TarjanCallStackPanel frame={frame} /> : panel === "concepts" ? <TarjanConceptsPanel frame={frame} /> : <TarjanTimelinePanel frameIndex={frame.index} onSelect={changeStep} />}</div><WatchPanel current={frame.state.current == null ? "—" : frame.state.labels[frame.state.current]} summary={componentSummary} phase={frame.state.phase} /></aside>}
-    </>
-  );
+      </div>
+    }
+    secondary={<aside className="secondary-sidebar"><div className="panel-tabs">{panelIds.map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "call-stack" ? `${frame.state.callStack.length} frames` : panel === "concepts" ? "4 concepts" : `${tarjanFrames.length} events`}</small></div><div className="panel-body">{panel === "variables" ? <TarjanVariablesPanel frame={frame} /> : panel === "call-stack" ? <TarjanCallStackPanel frame={frame} /> : panel === "concepts" ? <TarjanConceptsPanel frame={frame} /> : <TarjanTimelinePanel frameIndex={frame.index} onSelect={changeStep} />}</div><WatchPanel current={frame.state.current == null ? "—" : frame.state.labels[frame.state.current]} summary={componentSummary} phase={frame.state.phase} /></aside>}
+    panel={<TransportPanel step={step} frames={tarjanFrames} onChange={changeStep} rerun={capabilities.rerun} />}
+  />;
 }
 
 const ALGORITHM_VISUALIZER_LAYOUT: Record<string, LayoutRect> = {
@@ -191,12 +151,11 @@ const ALGORITHM_VISUALIZER_LAYOUT: Record<string, LayoutRect> = {
   "node:C": { x: 300, y: 300, width: 84, height: 84 },
 };
 
-function AlgorithmVisualizerWorkbench({ trace, layout: initialLayout, variant }: { trace: { title: string; frames: readonly AlgorithmVisualizerFrame[] }; layout: Record<string, LayoutRect>; variant: "dfs" | "red-black-tree" }) {
+function AlgorithmVisualizerWorkbench({ trace, layout: initialLayout, variant, onSelect }: { trace: { title: string; frames: readonly AlgorithmVisualizerFrame[] }; layout: Record<string, LayoutRect>; variant: "dfs" | "red-black-tree"; onSelect: (algorithm: AlgorithmId) => void }) {
   const isRedBlackTree = variant === "red-black-tree";
   const frames = trace.frames;
   const [step, setStep] = useState(0);
   const [panel, setPanel] = useState<AlgorithmVisualizerPanelId>("log");
-  const [inspectorVisible, setInspectorVisible] = useState(true);
   const [layout, setLayout] = useState<Record<string, LayoutRect>>(() => ({ ...initialLayout }));
   const [selectedElementIds, setSelectedElementIds] = useState<Record<string, boolean>>({});
   const apiRef = useRef<ExcalidrawApi | null>(null);
@@ -241,21 +200,24 @@ function AlgorithmVisualizerWorkbench({ trace, layout: initialLayout, variant }:
   const lastCommand = frame.commands.at(-1);
   const graphSummary = `${graph.nodes.length} nodes · ${graph.edges.length} edges`;
 
-  return (
-    <>
-      <main className="editor-shell">
-        <div className="editor-header"><div><span className="eyebrow">IMPORTED TRACE</span><h1>{trace.title}</h1></div><div className="editor-actions"><button className="action-button">↗ <span>Open source</span></button><button className="action-button" onClick={() => setInspectorVisible((visible) => !visible)}>{inspectorVisible ? "Hide" : "Show"} panels</button></div></div>
+  return <Workbench
+    title={trace.title}
+    algorithmLabel={isRedBlackTree ? "Red-black tree command trace" : "Algorithm Visualizer command trace"}
+    primary={<ScenarioNavigation algorithm={isRedBlackTree ? "algorithm-visualizer-red-black-tree" : "algorithm-visualizer-dfs"} onSelect={onSelect} />}
+    editor={
+      <div className="editor-shell">
+        <div className="editor-header"><div><span className="eyebrow">IMPORTED TRACE</span><h1>{trace.title}</h1></div><div className="editor-actions"><button className="action-button">↗ <span>Open source</span></button></div></div>
         <section className="canvas-frame" aria-label="Imported algorithm canvas">
           <div className="canvas-grid" /><div className="canvas-breadcrumb"><span className="live-dot" /> <span>{isRedBlackTree ? "TREE / RED-BLACK" : "IMPORTED / AV-COMMANDS"}</span><b>FRAME {String(step + 1).padStart(2, "0")}</b></div>
           <div className="excalidraw-host canvas-input-disabled"><Excalidraw initialData={{ elements, appState: { viewBackgroundColor: "#17191f" } }} theme="dark" excalidrawAPI={(api: unknown) => { apiRef.current = api as ExcalidrawApi; }} onChange={handleCanvasChange} UIOptions={{ tools: layoutOnlyTools, canvasActions: { changeViewBackgroundColor: false, clearCanvas: false, loadScene: false, saveToActiveFile: false, toggleTheme: false, saveAsImage: false, export: false } }} /></div>
           <div className="canvas-legend">{isRedBlackTree ? <><span><i className="legend-swatch rb-red" />Red node</span><span><i className="legend-swatch rb-black" />Black node</span></> : <><span><i className="legend-swatch on-stack" />Visited</span><span><i className="legend-swatch component" />Focus</span></>}<span><i className="legend-ring" />Replay frame</span></div><div className="canvas-hint">Command state is read-only; node layout remains yours</div>
         </section>
         <section className="explain-strip"><div className="step-number">{String(frame.index + 1).padStart(2, "0")}</div><div className="explain-copy"><span>TRACER COMMAND</span><strong>{lastCommand?.method ?? "Initial state"}</strong><p>{lastLog}</p></div><div className="concept-pill"><small>SOURCE LINE</small><b>{frame.lineNumber ?? "—"}</b></div></section>
-        <AlgorithmVisualizerTransportPanel step={step} frames={frames} onChange={changeStep} />
-      </main>
-      {inspectorVisible && <aside className="secondary-sidebar"><div className="panel-tabs">{(["log", "commands"] as const).map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "log" ? `${frame.logs.length} lines` : `${frame.commands.length} commands`}</small></div><div className="panel-body">{panel === "log" ? <AlgorithmVisualizerLogPanel logs={frame.logs} /> : <AlgorithmVisualizerCommandPanel frame={frame} />}</div><AlgorithmVisualizerSelectionPanel selection={selection} /><WatchPanel current={lastCommand?.method ?? "—"} summary={graphSummary} phase={frame.lineNumber == null ? "artifact" : `line ${frame.lineNumber}`} /></aside>}
-    </>
-  );
+      </div>
+    }
+    secondary={<aside className="secondary-sidebar"><div className="panel-tabs">{(["log", "commands"] as const).map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "log" ? `${frame.logs.length} lines` : `${frame.commands.length} commands`}</small></div><div className="panel-body">{panel === "log" ? <AlgorithmVisualizerLogPanel logs={frame.logs} /> : <AlgorithmVisualizerCommandPanel frame={frame} />}</div><AlgorithmVisualizerSelectionPanel selection={selection} /><WatchPanel current={lastCommand?.method ?? "—"} summary={graphSummary} phase={frame.lineNumber == null ? "artifact" : `line ${frame.lineNumber}`} /></aside>}
+    panel={<AlgorithmVisualizerTransportPanel step={step} frames={frames} onChange={changeStep} />}
+  />;
 }
 
 function AlgorithmVisualizerTransportPanel({ step, frames, onChange }: { step: number; frames: readonly AlgorithmVisualizerFrame[]; onChange: (index: number) => void }) {
@@ -274,12 +236,11 @@ function AlgorithmVisualizerSelectionPanel({ selection }: { selection: Algorithm
   return <div className={`selection-card ${selection ? "active" : ""}`} aria-live="polite"><div className="selection-card-heading"><span>SELECTED OBJECT</span><small>{selection?.kind ?? "canvas"}</small></div>{selection ? <><strong>{selection.label}</strong><p>{selection.detail}</p></> : <p>Select a node or edge on the canvas to inspect its replay state.</p>}</div>;
 }
 
-function LisWorkbench() {
+function LisWorkbench({ onSelect }: { onSelect: (algorithm: AlgorithmId) => void }) {
   const capabilities = lisScenario.capabilities;
   const panelIds: LisPanelId[] = ["variables", "concepts", "timeline"];
   const [step, setStep] = useState(0);
   const [panel, setPanel] = useState<LisPanelId>("variables");
-  const [inspectorVisible, setInspectorVisible] = useState(true);
   const [layout, setLayout] = useState<Record<string, LayoutRect>>(() => ({ ...LIS_LAYOUT }));
   const apiRef = useRef<ExcalidrawApi | null>(null);
   const applyingSceneRef = useRef(false);
@@ -316,21 +277,24 @@ function LisWorkbench() {
   };
   const best = frame.state.bestIndex === null ? "—" : `${frame.state.dp[frame.state.bestIndex]} @ ${frame.state.bestIndex}`;
 
-  return (
-    <>
-      <main className="editor-shell">
-        <div className="editor-header"><div><span className="eyebrow">NOW DEBUGGING</span><h1>Longest Increasing Subsequence</h1></div><div className="editor-actions"><button className="action-button">↗ <span>Open lesson</span></button><button className="action-button" onClick={() => setInspectorVisible((visible) => !visible)}>{inspectorVisible ? "Hide" : "Show"} panels</button></div></div>
+  return <Workbench
+    title="Longest Increasing Subsequence"
+    algorithmLabel="LIS dynamic programming"
+    primary={<ScenarioNavigation algorithm="lis" onSelect={onSelect} />}
+    editor={
+      <div className="editor-shell">
+        <div className="editor-header"><div><span className="eyebrow">NOW DEBUGGING</span><h1>Longest Increasing Subsequence</h1></div><div className="editor-actions"><button className="action-button">↗ <span>Open lesson</span></button></div></div>
         <section className="canvas-frame" aria-label="Algorithm canvas">
           <div className="canvas-grid" /><div className="canvas-breadcrumb"><span className="live-dot" /> <span>ARRAY / LIS-DP</span><b>FRAME {String(step + 1).padStart(2, "0")}</b></div>
           <div className={`excalidraw-host ${capabilities.editInput ? "canvas-input-enabled" : "canvas-input-disabled"}`}><Excalidraw initialData={{ elements, appState: { viewBackgroundColor: "#17191f" } }} theme="dark" excalidrawAPI={(api: unknown) => { apiRef.current = api as ExcalidrawApi; }} onChange={handleCanvasChange} UIOptions={{ tools: capabilities.editInput ? undefined : layoutOnlyTools, canvasActions: { changeViewBackgroundColor: false, clearCanvas: false, loadScene: false, saveToActiveFile: false, toggleTheme: false, saveAsImage: false, export: false } }} /></div>
           <div className="canvas-legend"><span><i className="legend-swatch sequence" />LIS member</span><span><i className="legend-swatch compare" />Compare</span><span><i className="legend-ring" />Current</span></div><div className="canvas-hint">Cells and predecessor links are read-only; layout remains yours</div>
         </section>
         <ExplainStrip frame={frame} concept={projectLisConceptLabel(frame.state)} />
-        <TransportPanel step={step} frames={lisFrames} onChange={changeStep} rerun={capabilities.rerun} />
-      </main>
-      {(!capabilities.toggleView || inspectorVisible) && <aside className="secondary-sidebar"><div className="panel-tabs">{panelIds.map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "concepts" ? "4 concepts" : `${lisFrames.length} events`}</small></div><div className="panel-body">{panel === "variables" ? <LisVariablesPanel frame={frame} /> : panel === "concepts" ? <LisConceptsPanel frame={frame} /> : <LisTimelinePanel frameIndex={frame.index} onSelect={changeStep} />}</div><WatchPanel current={frame.state.currentIndex === null ? "—" : `a[${frame.state.currentIndex}]`} summary={`length ${frame.state.sequence.length} · best ${best}`} phase={frame.state.phase} /></aside>}
-    </>
-  );
+      </div>
+    }
+    secondary={<aside className="secondary-sidebar"><div className="panel-tabs">{panelIds.map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "concepts" ? "4 concepts" : `${lisFrames.length} events`}</small></div><div className="panel-body">{panel === "variables" ? <LisVariablesPanel frame={frame} /> : panel === "concepts" ? <LisConceptsPanel frame={frame} /> : <LisTimelinePanel frameIndex={frame.index} onSelect={changeStep} />}</div><WatchPanel current={frame.state.currentIndex === null ? "—" : `a[${frame.state.currentIndex}]`} summary={`length ${frame.state.sequence.length} · best ${best}`} phase={frame.state.phase} /></aside>}
+    panel={<TransportPanel step={step} frames={lisFrames} onChange={changeStep} rerun={capabilities.rerun} />}
+  />;
 }
 
 function ExplainStrip({ frame, concept }: { frame: { event: { phase: string; label: string; detail: string }; index: number }; concept: string }) {

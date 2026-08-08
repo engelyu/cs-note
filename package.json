@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "node scripts/verify-licenses.mjs && node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types scripts/verify-lis-artifact.mjs && node --experimental-strip-types --test tests/observation.test.mjs tests/tarjan.test.mjs tests/lis.test.mjs tests/algorithm-visualizer.test.mjs",
+    "test": "node scripts/verify-licenses.mjs && node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types scripts/verify-lis-artifact.mjs && node --experimental-strip-types --test tests/observation.test.mjs tests/tarjan.test.mjs tests/lis.test.mjs tests/algorithm-visualizer.test.mjs tests/workbenchState.test.mjs",
     "generate:tarjan": "node --experimental-strip-types scripts/generate-tarjan-artifact.mjs",
     "generate:lis": "node --experimental-strip-types scripts/generate-lis-artifact.mjs",
     "verify:tarjan": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs",
