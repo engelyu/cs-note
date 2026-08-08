@@ -1,0 +1,111 @@
+import type { LayoutRect } from "../core/types";
+import type { TarjanState } from "./tarjan";
+
+type Point = { x: number; y: number };
+
+export type CanvasElementSnapshot = {
+  id?: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+};
+
+export function captureTarjanLayout(
+  elements: readonly CanvasElementSnapshot[],
+  previous: Record<string, LayoutRect>,
+): Record<string, LayoutRect> {
+  const next = Object.fromEntries(
+    Object.entries(previous).map(([id, rect]) => [id, { ...rect }]),
+  ) as Record<string, LayoutRect>;
+
+  for (const element of elements) {
+    if (!element.id?.startsWith("node:") || element.x == null || element.y == null) continue;
+    const previousRect = next[element.id];
+    if (!previousRect) continue;
+    next[element.id] = {
+      x: element.x,
+      y: element.y,
+      width: element.width ?? previousRect.width,
+      height: element.height ?? previousRect.height,
+    };
+  }
+
+  return next;
+}
+
+function boundary(center: Point, radius: number, toward: Point): Point {
+  const dx = toward.x - center.x;
+  const dy = toward.y - center.y;
+  const distance = Math.hypot(dx, dy) || 1;
+  return { x: center.x + (dx / distance) * radius, y: center.y + (dy / distance) * radius };
+}
+
+export function createTarjanSkeletons(
+  state: TarjanState,
+  layout: Record<string, LayoutRect>,
+): unknown[] {
+  const skeletons: unknown[] = [];
+  const centers = new Map<string, Point>();
+  for (const label of state.labels) {
+    const rect = layout[`node:${label}`];
+    centers.set(label, { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 });
+  }
+
+  for (const edge of state.edges) {
+    const fromLabel = state.labels[edge.from];
+    const toLabel = state.labels[edge.to];
+    const from = centers.get(fromLabel) as Point;
+    const to = centers.get(toLabel) as Point;
+    const start = boundary(from, layout[`node:${fromLabel}`].width / 2, to);
+    const end = boundary(to, layout[`node:${toLabel}`].width / 2, from);
+    const active = state.activeEdge?.from === edge.from && state.activeEdge?.to === edge.to;
+    const phase = state.activeEdge?.from === edge.from && state.activeEdge?.to === edge.to
+      ? state.line
+      : "plain";
+    skeletons.push({
+      type: "arrow",
+      id: `edge:${edge.from}-${edge.to}`,
+      x: start.x,
+      y: start.y,
+      points: [[0, 0], [end.x - start.x, end.y - start.y]],
+      start: { id: `node:${fromLabel}` },
+      end: { id: `node:${toLabel}` },
+      strokeColor: active ? "#f2b84b" : phase === "back-edge" ? "#f7768e" : "#7f8ea3",
+      strokeWidth: active ? 3 : 2,
+      strokeStyle: phase === "back-edge" ? "dashed" : "solid",
+      endArrowhead: "arrow",
+      customData: { componentType: "graph-edge", componentId: `edge:${edge.from}-${edge.to}`, role: "edge" },
+    });
+  }
+
+  for (let index = 0; index < state.labels.length; index += 1) {
+    const label = state.labels[index];
+    const rect = layout[`node:${label}`];
+    const inComponent = state.components.some((component) => component.includes(index));
+    const onStack = state.onStack[index];
+    const current = state.current === index;
+    const fill = inComponent ? "#173b36" : onStack ? "#193451" : "#20232b";
+    const stroke = current ? "#f2b84b" : inComponent ? "#55d6be" : onStack ? "#63a7ff" : "#7f8ea3";
+    const badge = state.disc[index] === -1 ? "unvisited" : `${state.disc[index]} / ${state.low[index]}`;
+    skeletons.push({
+      type: "ellipse",
+      id: `node:${label}`,
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      backgroundColor: fill,
+      strokeColor: stroke,
+      strokeWidth: current ? 4 : 2,
+      label: { text: `${label}\n${badge}`, fontSize: 16 },
+      customData: {
+        componentType: "graph-node",
+        componentId: `node:${label}`,
+        role: "vertex",
+        label,
+      },
+    });
+  }
+  return skeletons;
+}
