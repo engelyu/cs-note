@@ -12,10 +12,19 @@ import { LIS_LAYOUT } from "../visualizations/lisLayout";
 import { lisPackage } from "../visualizations/lisRuntime";
 import type { LisState } from "../visualizations/lisModel";
 import { projectLisConceptLabel, projectLisConcepts, projectLisTimeline, projectLisVariables } from "../visualizations/lisProjections";
+import { algorithmVisualizerDfs, algorithmVisualizerDfsFrames } from "../algorithmVisualizer/dfsRuntime";
+import type { AlgorithmVisualizerFrame } from "../algorithmVisualizer/trace";
+import {
+  captureAlgorithmVisualizerGraphLayout,
+  createAlgorithmVisualizerGraphSkeletons,
+  isAlgorithmVisualizerGraphSceneSafe,
+  type AlgorithmVisualizerCanvasElement,
+} from "../algorithmVisualizer/graphScene";
 
-type AlgorithmId = "tarjan" | "lis";
+type AlgorithmId = "tarjan" | "lis" | "algorithm-visualizer";
 type TarjanPanelId = "variables" | "call-stack" | "concepts" | "timeline";
 type LisPanelId = "variables" | "concepts" | "timeline";
+type AlgorithmVisualizerPanelId = "log" | "commands";
 
 type ExcalidrawApi = { updateScene: (scene: { elements: unknown[] }) => void };
 
@@ -45,13 +54,13 @@ export function App() {
   const [algorithm, setAlgorithm] = useState<AlgorithmId>("tarjan");
   return (
     <WorkbenchShell algorithm={algorithm} onSelect={setAlgorithm}>
-      {algorithm === "tarjan" ? <TarjanWorkbench /> : <LisWorkbench />}
+      {algorithm === "tarjan" ? <TarjanWorkbench /> : algorithm === "lis" ? <LisWorkbench /> : <AlgorithmVisualizerWorkbench />}
     </WorkbenchShell>
   );
 }
 
 function WorkbenchShell({ algorithm, onSelect, children }: { algorithm: AlgorithmId; onSelect: (algorithm: AlgorithmId) => void; children: ReactNode }) {
-  const title = algorithm === "tarjan" ? "Tarjan's Algorithm" : "Longest Increasing Subsequence";
+  const title = algorithm === "tarjan" ? "Tarjan's Algorithm" : algorithm === "lis" ? "Longest Increasing Subsequence" : algorithmVisualizerDfs.title;
   return (
     <div className="cs-app">
       <header className="titlebar">
@@ -82,16 +91,21 @@ function WorkbenchShell({ algorithm, onSelect, children }: { algorithm: Algorith
             <span><strong>Longest Increasing Subsequence</strong><small>Dynamic programming · {lisFrames.length} events</small></span>
             <i>›</i>
           </button>
+          <button className={`scenario-card ${algorithm === "algorithm-visualizer" ? "active" : ""}`} onClick={() => onSelect("algorithm-visualizer")}>
+            <span className="scenario-index av-index">03</span>
+            <span><strong>Imported DFS</strong><small>AV command trace · {algorithmVisualizerDfsFrames.length} frames</small></span>
+            <i>›</i>
+          </button>
           <div className="sidebar-divider" />
           <div className="sidebar-section-label">SESSION</div>
-          <div className="session-card"><span className="session-dot" /><span><strong>Live trace</strong><small>semantic artifact · v1</small></span></div>
-          <div className="sidebar-note"><strong>What to watch</strong><p>{algorithm === "tarjan" ? "Low-link values travel backward through the DFS stack." : "Each dp[i] records the best increasing subsequence ending here."}</p></div>
+          <div className="session-card"><span className="session-dot" /><span><strong>{algorithm === "algorithm-visualizer" ? "Imported trace" : "Live trace"}</strong><small>{algorithm === "algorithm-visualizer" ? "Algorithm Visualizer commands" : "semantic artifact · v1"}</small></span></div>
+          <div className="sidebar-note"><strong>What to watch</strong><p>{algorithm === "tarjan" ? "Low-link values travel backward through the DFS stack." : algorithm === "lis" ? "Each dp[i] records the best increasing subsequence ending here." : "Tracer commands become replay frames while the graph keeps its own state."}</p></div>
         </aside>
 
         {children}
       </div>
 
-      <footer className="statusbar"><span><i className="status-dot" /> CS NOTE / LOCAL ARTIFACT</span><span>{algorithm === "tarjan" ? "Tarjan SCC" : "LIS dynamic programming"} · schema v1</span><span className="status-spacer" /><span>EN</span><span>UTF-8</span></footer>
+      <footer className="statusbar"><span><i className="status-dot" /> CS NOTE / LOCAL ARTIFACT</span><span>{algorithm === "tarjan" ? "Tarjan SCC" : algorithm === "lis" ? "LIS dynamic programming" : "Algorithm Visualizer command trace"} · schema v1</span><span className="status-spacer" /><span>EN</span><span>UTF-8</span></footer>
     </div>
   );
 }
@@ -153,6 +167,84 @@ function TarjanWorkbench() {
       {(!capabilities.toggleView || inspectorVisible) && <aside className="secondary-sidebar"><div className="panel-tabs">{panelIds.map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "call-stack" ? `${frame.state.callStack.length} frames` : panel === "concepts" ? "4 concepts" : `${tarjanFrames.length} events`}</small></div><div className="panel-body">{panel === "variables" ? <TarjanVariablesPanel frame={frame} /> : panel === "call-stack" ? <TarjanCallStackPanel frame={frame} /> : panel === "concepts" ? <TarjanConceptsPanel frame={frame} /> : <TarjanTimelinePanel frameIndex={frame.index} onSelect={changeStep} />}</div><WatchPanel current={frame.state.current == null ? "—" : frame.state.labels[frame.state.current]} summary={componentSummary} phase={frame.state.phase} /></aside>}
     </>
   );
+}
+
+const ALGORITHM_VISUALIZER_LAYOUT: Record<string, LayoutRect> = {
+  "node:A": { x: 180, y: 100, width: 84, height: 84 },
+  "node:B": { x: 420, y: 100, width: 84, height: 84 },
+  "node:C": { x: 300, y: 300, width: 84, height: 84 },
+};
+
+function AlgorithmVisualizerWorkbench() {
+  const [step, setStep] = useState(0);
+  const [panel, setPanel] = useState<AlgorithmVisualizerPanelId>("log");
+  const [inspectorVisible, setInspectorVisible] = useState(true);
+  const [layout, setLayout] = useState<Record<string, LayoutRect>>(() => ({ ...ALGORITHM_VISUALIZER_LAYOUT }));
+  const apiRef = useRef<ExcalidrawApi | null>(null);
+  const applyingSceneRef = useRef(false);
+  const frame = algorithmVisualizerDfsFrames[step];
+  const graph = frame.graph;
+  if (!graph) throw new Error("Imported Algorithm Visualizer frame has no graph state");
+  const elements = useMemo(() => convertToStableExcalidrawElements(createAlgorithmVisualizerGraphSkeletons(graph, layout)), [graph, layout]);
+
+  useEffect(() => {
+    if (!apiRef.current) return;
+    applyingSceneRef.current = true;
+    apiRef.current.updateScene({ elements });
+    const reset = window.setTimeout(() => { applyingSceneRef.current = false; }, 0);
+    return () => window.clearTimeout(reset);
+  }, [elements]);
+
+  const changeStep = (next: number) => setStep(Math.max(0, Math.min(algorithmVisualizerDfsFrames.length - 1, next)));
+  const handleCanvasChange = (nextElements: readonly unknown[]) => {
+    if (applyingSceneRef.current) return;
+    const typedElements = nextElements as AlgorithmVisualizerCanvasElement[];
+    const nextLayout = captureAlgorithmVisualizerGraphLayout(typedElements, layout);
+    const changed = Object.keys(nextLayout).some((id) => {
+      const before = layout[id];
+      const after = nextLayout[id];
+      return before.x !== after.x || before.y !== after.y || before.width !== after.width || before.height !== after.height;
+    });
+    if (changed) setLayout(nextLayout);
+    const canonical = convertToStableExcalidrawElements(createAlgorithmVisualizerGraphSkeletons(graph, changed ? nextLayout : layout));
+    if (!isAlgorithmVisualizerGraphSceneSafe(typedElements, canonical as AlgorithmVisualizerCanvasElement[])) {
+      applyingSceneRef.current = true;
+      apiRef.current?.updateScene({ elements: canonical });
+      window.setTimeout(() => { applyingSceneRef.current = false; }, 0);
+    }
+  };
+
+  const lastLog = frame.logs.at(-1) ?? "No log output yet";
+  const lastCommand = frame.commands.at(-1);
+  const graphSummary = `${graph.nodes.length} nodes · ${graph.edges.length} edges`;
+
+  return (
+    <>
+      <main className="editor-shell">
+        <div className="editor-header"><div><span className="eyebrow">IMPORTED TRACE</span><h1>{algorithmVisualizerDfs.title}</h1></div><div className="editor-actions"><button className="action-button">↗ <span>Open source</span></button><button className="action-button" onClick={() => setInspectorVisible((visible) => !visible)}>{inspectorVisible ? "Hide" : "Show"} panels</button></div></div>
+        <section className="canvas-frame" aria-label="Imported algorithm canvas">
+          <div className="canvas-grid" /><div className="canvas-breadcrumb"><span className="live-dot" /> <span>IMPORTED / AV-COMMANDS</span><b>FRAME {String(step + 1).padStart(2, "0")}</b></div>
+          <div className="excalidraw-host canvas-input-disabled"><Excalidraw initialData={{ elements, appState: { viewBackgroundColor: "#17191f" } }} theme="dark" excalidrawAPI={(api: unknown) => { apiRef.current = api as ExcalidrawApi; }} onChange={handleCanvasChange} UIOptions={{ tools: layoutOnlyTools, canvasActions: { changeViewBackgroundColor: false, clearCanvas: false, loadScene: false, saveToActiveFile: false, toggleTheme: false, saveAsImage: false, export: false } }} /></div>
+          <div className="canvas-legend"><span><i className="legend-swatch on-stack" />Visited</span><span><i className="legend-swatch component" />Focus</span><span><i className="legend-ring" />Replay frame</span></div><div className="canvas-hint">Command state is read-only; node layout remains yours</div>
+        </section>
+        <section className="explain-strip"><div className="step-number">{String(frame.index + 1).padStart(2, "0")}</div><div className="explain-copy"><span>TRACER COMMAND</span><strong>{lastCommand?.method ?? "Initial state"}</strong><p>{lastLog}</p></div><div className="concept-pill"><small>SOURCE LINE</small><b>{frame.lineNumber ?? "—"}</b></div></section>
+        <AlgorithmVisualizerTransportPanel step={step} frames={algorithmVisualizerDfsFrames} onChange={changeStep} />
+      </main>
+      {inspectorVisible && <aside className="secondary-sidebar"><div className="panel-tabs">{(["log", "commands"] as const).map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "log" ? `${frame.logs.length} lines` : `${frame.commands.length} commands`}</small></div><div className="panel-body">{panel === "log" ? <AlgorithmVisualizerLogPanel logs={frame.logs} /> : <AlgorithmVisualizerCommandPanel frame={frame} />}</div><WatchPanel current={lastCommand?.method ?? "—"} summary={graphSummary} phase={frame.lineNumber == null ? "artifact" : `line ${frame.lineNumber}`} /></aside>}
+    </>
+  );
+}
+
+function AlgorithmVisualizerTransportPanel({ step, frames, onChange }: { step: number; frames: readonly AlgorithmVisualizerFrame[]; onChange: (index: number) => void }) {
+  return <section className="transport-panel"><div className="transport-top"><span>COMMAND TRACE</span><small>{step + 1} / {frames.length} frames</small></div><div className="transport-track"><div className="track-line"><i style={{ width: `${(step / Math.max(1, frames.length - 1)) * 100}%` }} /></div>{frames.map((frame, index) => <button key={`av-frame-${frame.index}`} className={index <= step ? "done" : ""} onClick={() => onChange(index)} aria-label={`Go to imported frame ${index + 1}`} />)}</div><div className="transport-controls"><button onClick={() => onChange(step - 1)} aria-label="Previous imported frame">←</button><button className="play-button" onClick={() => onChange(step + 1)} disabled={step === frames.length - 1} aria-label={step === frames.length - 1 ? "Trace complete" : "Next imported frame"}>{step === frames.length - 1 ? "✓" : "▶"}</button><button onClick={() => onChange(step + 1)} aria-label="Next imported frame">→</button><span className="key-hint"><kbd>←</kbd><kbd>→</kbd> STEP</span></div></section>;
+}
+
+function AlgorithmVisualizerLogPanel({ logs }: { logs: readonly string[] }) {
+  return <div className="timeline-list">{logs.length === 0 ? <div className="empty-state">No log output</div> : logs.map((log, index) => <div className="timeline-entry active" key={`${index}-${log}`}><span className="timeline-index">{String(index + 1).padStart(2, "0")}</span><span><strong>{log}</strong><small>LogTracer</small></span></div>)}</div>;
+}
+
+function AlgorithmVisualizerCommandPanel({ frame }: { frame: AlgorithmVisualizerFrame }) {
+  return <div className="timeline-list">{frame.commands.length === 0 ? <div className="empty-state">No commands before this frame</div> : frame.commands.map((command, index) => <div className="timeline-entry" key={`${index}-${command.key}-${command.method}`}><span className="timeline-index">{String(index + 1).padStart(2, "0")}</span><span><strong>{command.method}</strong><small>{command.key ?? "layout"}</small></span></div>)}</div>;
 }
 
 function LisWorkbench() {
@@ -227,8 +319,8 @@ function WatchPanel({ current, summary, phase }: { current: string; summary: str
   return <div className="watch-panel"><div className="panel-heading"><span>WATCH</span><small>semantic</small></div><div className="watch-row"><span>current</span><b>{current}</b></div><div className="watch-row"><span>summary</span><b>{summary}</b></div><div className="watch-row"><span>phase</span><b>{phase}</b></div></div>;
 }
 
-function panelLabel(id: TarjanPanelId | LisPanelId): string {
-  return id === "call-stack" ? "Call Stack" : id === "variables" ? "Variables" : id === "concepts" ? "Concepts" : "Timeline";
+function panelLabel(id: TarjanPanelId | LisPanelId | AlgorithmVisualizerPanelId): string {
+  return id === "call-stack" ? "Call Stack" : id === "variables" ? "Variables" : id === "concepts" ? "Concepts" : id === "log" ? "Log" : id === "commands" ? "Commands" : "Timeline";
 }
 
 function TarjanVariablesPanel({ frame }: { frame: typeof tarjanFrames[number] }) {

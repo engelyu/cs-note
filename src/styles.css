@@ -36,6 +36,7 @@ button:focus-visible { outline: 2px solid #79b8ff; outline-offset: 2px; }
 .scenario-card:hover, .scenario-card.active { background: #242731; border-color: #353a48; }
 .scenario-index { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 5px; background: #294b5a; color: #8dd1ed; font: 10px ui-monospace, monospace; }
 .scenario-index.lis-index { background: #473a65; color: #c6b9ff; }
+.scenario-index.av-index { background: #5a4430; color: #f0c28b; }
 .scenario-card span:nth-child(2), .session-card span:last-child { display: flex; flex-direction: column; gap: 4px; }
 .scenario-card strong, .session-card strong { color: #e7e9ee; font-size: 11px; font-weight: 600; line-height: 1.3; }
 .scenario-card small, .session-card small { color: #7f8796; font-size: 9px; }
