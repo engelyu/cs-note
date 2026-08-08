@@ -18,7 +18,9 @@ import {
   captureAlgorithmVisualizerGraphLayout,
   createAlgorithmVisualizerGraphSkeletons,
   isAlgorithmVisualizerGraphSceneSafe,
+  projectAlgorithmVisualizerSelection,
   type AlgorithmVisualizerCanvasElement,
+  type AlgorithmVisualizerSelection,
 } from "../algorithmVisualizer/graphScene";
 
 type AlgorithmId = "tarjan" | "lis" | "algorithm-visualizer";
@@ -180,12 +182,14 @@ function AlgorithmVisualizerWorkbench() {
   const [panel, setPanel] = useState<AlgorithmVisualizerPanelId>("log");
   const [inspectorVisible, setInspectorVisible] = useState(true);
   const [layout, setLayout] = useState<Record<string, LayoutRect>>(() => ({ ...ALGORITHM_VISUALIZER_LAYOUT }));
+  const [selectedElementIds, setSelectedElementIds] = useState<Record<string, boolean>>({});
   const apiRef = useRef<ExcalidrawApi | null>(null);
   const applyingSceneRef = useRef(false);
   const frame = algorithmVisualizerDfsFrames[step];
   const graph = frame.graph;
   if (!graph) throw new Error("Imported Algorithm Visualizer frame has no graph state");
   const elements = useMemo(() => convertToStableExcalidrawElements(createAlgorithmVisualizerGraphSkeletons(graph, layout)), [graph, layout]);
+  const selection = projectAlgorithmVisualizerSelection(graph, selectedElementIds);
 
   useEffect(() => {
     if (!apiRef.current) return;
@@ -196,8 +200,9 @@ function AlgorithmVisualizerWorkbench() {
   }, [elements]);
 
   const changeStep = (next: number) => setStep(Math.max(0, Math.min(algorithmVisualizerDfsFrames.length - 1, next)));
-  const handleCanvasChange = (nextElements: readonly unknown[]) => {
+  const handleCanvasChange = (nextElements: readonly unknown[], appState?: { selectedElementIds?: Record<string, boolean> }) => {
     if (applyingSceneRef.current) return;
+    if (appState?.selectedElementIds) setSelectedElementIds({ ...appState.selectedElementIds });
     const typedElements = nextElements as AlgorithmVisualizerCanvasElement[];
     const nextLayout = captureAlgorithmVisualizerGraphLayout(typedElements, layout);
     const changed = Object.keys(nextLayout).some((id) => {
@@ -230,7 +235,7 @@ function AlgorithmVisualizerWorkbench() {
         <section className="explain-strip"><div className="step-number">{String(frame.index + 1).padStart(2, "0")}</div><div className="explain-copy"><span>TRACER COMMAND</span><strong>{lastCommand?.method ?? "Initial state"}</strong><p>{lastLog}</p></div><div className="concept-pill"><small>SOURCE LINE</small><b>{frame.lineNumber ?? "—"}</b></div></section>
         <AlgorithmVisualizerTransportPanel step={step} frames={algorithmVisualizerDfsFrames} onChange={changeStep} />
       </main>
-      {inspectorVisible && <aside className="secondary-sidebar"><div className="panel-tabs">{(["log", "commands"] as const).map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "log" ? `${frame.logs.length} lines` : `${frame.commands.length} commands`}</small></div><div className="panel-body">{panel === "log" ? <AlgorithmVisualizerLogPanel logs={frame.logs} /> : <AlgorithmVisualizerCommandPanel frame={frame} />}</div><WatchPanel current={lastCommand?.method ?? "—"} summary={graphSummary} phase={frame.lineNumber == null ? "artifact" : `line ${frame.lineNumber}`} /></aside>}
+      {inspectorVisible && <aside className="secondary-sidebar"><div className="panel-tabs">{(["log", "commands"] as const).map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div><div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "log" ? `${frame.logs.length} lines` : `${frame.commands.length} commands`}</small></div><div className="panel-body">{panel === "log" ? <AlgorithmVisualizerLogPanel logs={frame.logs} /> : <AlgorithmVisualizerCommandPanel frame={frame} />}</div><AlgorithmVisualizerSelectionPanel selection={selection} /><WatchPanel current={lastCommand?.method ?? "—"} summary={graphSummary} phase={frame.lineNumber == null ? "artifact" : `line ${frame.lineNumber}`} /></aside>}
     </>
   );
 }
@@ -245,6 +250,10 @@ function AlgorithmVisualizerLogPanel({ logs }: { logs: readonly string[] }) {
 
 function AlgorithmVisualizerCommandPanel({ frame }: { frame: AlgorithmVisualizerFrame }) {
   return <div className="timeline-list">{frame.commands.length === 0 ? <div className="empty-state">No commands before this frame</div> : frame.commands.map((command, index) => <div className="timeline-entry" key={`${index}-${command.key}-${command.method}`}><span className="timeline-index">{String(index + 1).padStart(2, "0")}</span><span><strong>{command.method}</strong><small>{command.key ?? "layout"}</small></span></div>)}</div>;
+}
+
+function AlgorithmVisualizerSelectionPanel({ selection }: { selection: AlgorithmVisualizerSelection | null }) {
+  return <div className={`selection-card ${selection ? "active" : ""}`} aria-live="polite"><div className="selection-card-heading"><span>SELECTED OBJECT</span><small>{selection?.kind ?? "canvas"}</small></div>{selection ? <><strong>{selection.label}</strong><p>{selection.detail}</p></> : <p>Select a node or edge on the canvas to inspect its replay state.</p>}</div>;
 }
 
 function LisWorkbench() {

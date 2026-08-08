@@ -11,6 +11,7 @@ import {
   captureAlgorithmVisualizerGraphLayout,
   isAlgorithmVisualizerGraphSceneExact,
   isAlgorithmVisualizerGraphSceneSafe,
+  projectAlgorithmVisualizerSelection,
 } from "../src/algorithmVisualizer/graphScene.ts";
 
 const commands = [
@@ -107,4 +108,24 @@ test("Imported graph scenes preserve layout edits while restoring command state"
   assert.equal(isAlgorithmVisualizerGraphSceneSafe(moved, canonical), true);
   assert.equal(isAlgorithmVisualizerGraphSceneExact(moved, canonical), false);
   assert.equal(isAlgorithmVisualizerGraphSceneSafe(recolored, canonical), false);
+});
+
+test("Excalidraw selection resolves to the current logical graph object", () => {
+  const graph = algorithmVisualizerDfs.frames[3].graph;
+  assert.ok(graph);
+
+  assert.deepEqual(projectAlgorithmVisualizerSelection(graph, { "node:A": true }), {
+    elementId: "node:A",
+    kind: "node",
+    label: "A",
+    detail: "visited 0 · selected 1",
+  });
+  assert.deepEqual(projectAlgorithmVisualizerSelection(graph, { "edge:A-B": true }), {
+    elementId: "edge:A-B",
+    kind: "edge",
+    label: "A → B",
+    detail: "visited 1 · selected 0",
+  });
+  assert.equal(projectAlgorithmVisualizerSelection(graph, { "node:missing": true }), null);
+  assert.equal(projectAlgorithmVisualizerSelection(graph, {}), null);
 });

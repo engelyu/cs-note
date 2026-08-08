@@ -3,6 +3,13 @@ import type { AlgorithmVisualizerGraphState } from "./trace";
 
 type Point = { x: number; y: number };
 
+export type AlgorithmVisualizerSelection = {
+  elementId: string;
+  kind: "node" | "edge";
+  label: string;
+  detail: string;
+};
+
 export type AlgorithmVisualizerCanvasElement = {
   id?: string;
   type?: string;
@@ -69,6 +76,37 @@ function nodeKey(value: string | number): string {
 
 function edgeKey(source: string | number, target: string | number): string {
   return `edge:${nodeId(source)}-${nodeId(target)}`;
+}
+
+function selectedElementId(selectedElementIds: Readonly<Record<string, boolean>> | null | undefined): string | null {
+  return Object.entries(selectedElementIds ?? {}).find(([, selected]) => selected)?.[0] ?? null;
+}
+
+export function projectAlgorithmVisualizerSelection(
+  state: AlgorithmVisualizerGraphState,
+  selectedElementIds: Readonly<Record<string, boolean>> | null | undefined,
+): AlgorithmVisualizerSelection | null {
+  const elementId = selectedElementId(selectedElementIds);
+  if (!elementId) return null;
+
+  const node = state.nodes.find((candidate) => nodeKey(candidate.id) === elementId);
+  if (node) {
+    return {
+      elementId,
+      kind: "node",
+      label: nodeId(node.id),
+      detail: `visited ${node.visitedCount} · selected ${node.selectedCount}`,
+    };
+  }
+
+  const edge = state.edges.find((candidate) => edgeKey(candidate.source, candidate.target) === elementId);
+  if (!edge) return null;
+  return {
+    elementId,
+    kind: "edge",
+    label: `${nodeId(edge.source)} → ${nodeId(edge.target)}`,
+    detail: `visited ${edge.visitedCount} · selected ${edge.selectedCount}`,
+  };
 }
 
 function boundary(center: Point, radius: number, toward: Point): Point {
