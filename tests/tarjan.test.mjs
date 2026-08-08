@@ -21,11 +21,13 @@ test("Tarjan package exposes a replayable semantic scenario", () => {
   ]);
   assert.equal(tarjanPackage.scenarios.length, 1);
   assert.ok(tarjanPackage.scenarios[0].frames.length > 1);
-  assert.equal(tarjanPackage.capabilities.toggleView, true);
-  assert.equal(tarjanPackage.capabilities.editLayout, true);
-  assert.equal(tarjanPackage.capabilities.editInput, false);
-  assert.equal(tarjanPackage.capabilities.rerun, false);
+  assert.equal(tarjanPackage.scenarios[0].capabilities.toggleView, true);
+  assert.equal(tarjanPackage.scenarios[0].capabilities.editLayout, true);
+  assert.equal(tarjanPackage.scenarios[0].capabilities.editInput, false);
+  assert.equal(tarjanPackage.scenarios[0].capabilities.rerun, false);
   assert.equal(tarjanPackage.scenarios[0].frames.length, createTarjanFrames().length);
+  const artifactFinalState = tarjanPackage.scenarios[0].frames.at(-1)?.state;
+  assert.deepEqual(artifactFinalState.components, [[4], [3], [0, 1, 2]]);
 });
 
 test("Tarjan frames preserve the teaching concepts behind SCC detection", () => {
@@ -43,6 +45,20 @@ test("Tarjan frames preserve the teaching concepts behind SCC detection", () => 
   assert.ok(frames.some((frame) => frame.event.phase === "scc"));
   assert.ok(frames.some((frame) => frame.event.focus?.kind === "concept"));
   assert.deepEqual(frames.filter((frame) => frame.event.phase === "scc").map((frame) => frame.state.components.at(-1)), [[4], [3], [0, 1, 2]]);
+});
+
+test("Tarjan frames are independently snapshotted", () => {
+  const frames = createTarjanFrames();
+  const earlier = frames[1];
+  const later = frames[2];
+
+  earlier.state.labels[0] = "mutated";
+  earlier.state.edges[0].from = 99;
+  earlier.state.stack.push(99);
+
+  assert.equal(later.state.labels[0], "A");
+  assert.equal(later.state.edges[0].from, 0);
+  assert.deepEqual(later.state.stack, [0]);
 });
 
 test("Graph Canvas layout edits stay separate from semantic state", () => {
@@ -91,11 +107,17 @@ test("Graph Canvas restores semantic edits while preserving node layout edits", 
   const recoloredNode = canonical.map((element) => element.id === "node:A"
     ? { ...element, backgroundColor: "#ffffff" }
     : element);
+  const deletedNode = canonical.map((element) => element.id === "node:A"
+    ? { ...element, isDeleted: true }
+    : element);
   const addedElement = [...canonical, { id: "user-drawn-line", type: "line" }];
 
   assert.equal(isTarjanSceneSafe(movedNode, canonical), true);
   assert.equal(isTarjanSceneSafe(recoloredNode, canonical), false);
+  assert.equal(isTarjanSceneSafe(deletedNode, canonical), false);
   assert.equal(isTarjanSceneSafe(addedElement, canonical), false);
+  const focusedElementId = frame.event.focus?.id;
+  assert.equal(canonical.some((element) => element.id === focusedElementId), true);
 });
 
 test("Debugger projections derive from the current semantic frame", () => {
@@ -114,7 +136,12 @@ test("Debugger projections derive from the current semantic frame", () => {
   assert.equal(callStack[0]?.label, "C");
   assert.equal(callStack[0]?.active, true);
   assert.equal(concepts.find((concept) => concept.id === "low-link")?.detail, "low[C] = 0");
+  assert.equal(concepts.find((concept) => concept.id === "scc")?.focus.id, "scc");
   assert.equal(timeline[frame.index]?.active, true);
   assert.equal(timeline[frame.index]?.eventId, frame.event.id);
   assert.equal(timeline[frame.index]?.focus?.kind, "entity");
+
+  const sccFrame = frames.find((candidate) => candidate.event.phase === "scc");
+  assert.ok(sccFrame);
+  assert.equal(projectTarjanConcepts(sccFrame).find((concept) => concept.id === "scc")?.active, true);
 });

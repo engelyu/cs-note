@@ -26,6 +26,8 @@ export type CanvasElementSnapshot = {
   label?: unknown;
   fontSize?: number;
   customData?: unknown;
+  isDeleted?: boolean;
+  locked?: boolean;
 };
 
 const SHARED_SCENE_FIELDS = [
@@ -42,6 +44,8 @@ const SHARED_SCENE_FIELDS = [
   "label",
   "fontSize",
   "customData",
+  "isDeleted",
+  "locked",
 ] as const;
 
 const EDGE_SCENE_FIELDS = [

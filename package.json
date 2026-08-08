@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test tests/tarjan.test.mjs"
+    "test": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types --test tests/tarjan.test.mjs",
+    "generate:tarjan": "node --experimental-strip-types scripts/generate-tarjan-artifact.mjs",
+    "verify:tarjan": "node --experimental-strip-types scripts/verify-tarjan-artifact.mjs"
   },
   "dependencies": {
     "react": "19.2.8",

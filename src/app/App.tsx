@@ -38,6 +38,8 @@ type ExcalidrawElement = {
   label?: unknown;
   fontSize?: number;
   customData?: unknown;
+  isDeleted?: boolean;
+  locked?: boolean;
 };
 
 type ExcalidrawApi = {
@@ -46,6 +48,7 @@ type ExcalidrawApi = {
 
 const scenario = tarjanPackage.scenarios[0];
 const frames = scenario.frames;
+const capabilities = scenario.capabilities;
 const panelIds = tarjanPackage.views
   .filter((view) => view.kind === "panel")
   .map((view) => view.id)
@@ -131,7 +134,7 @@ export function App() {
         <main className="editor-shell">
           <div className="editor-header">
             <div><span className="eyebrow">NOW DEBUGGING</span><h1>Tarjan's Strongly Connected Components</h1></div>
-            <div className="editor-actions"><button className="action-button">↗ <span>Open lesson</span></button>{tarjanPackage.capabilities.toggleView && <button className="action-button" onClick={() => setInspectorVisible((visible) => !visible)}>{inspectorVisible ? "Hide" : "Show"} panels</button>}</div>
+            <div className="editor-actions"><button className="action-button">↗ <span>Open lesson</span></button>{capabilities.toggleView && <button className="action-button" onClick={() => setInspectorVisible((visible) => !visible)}>{inspectorVisible ? "Hide" : "Show"} panels</button>}</div>
           </div>
 
           <section className="canvas-frame" aria-label="Algorithm canvas">
@@ -142,8 +145,24 @@ export function App() {
                 initialData={{ elements, appState: { viewBackgroundColor: "#17191f" } }}
                 theme="dark"
                 excalidrawAPI={(api: unknown) => { apiRef.current = api as ExcalidrawApi; }}
-                onChange={tarjanPackage.capabilities.editLayout ? handleCanvasChange : undefined}
+                onChange={capabilities.editLayout ? handleCanvasChange : undefined}
                 UIOptions={{
+                  tools: {
+                    selection: true,
+                    hand: true,
+                    rectangle: false,
+                    diamond: false,
+                    ellipse: false,
+                    arrow: false,
+                    line: false,
+                    freedraw: false,
+                    text: false,
+                    image: false,
+                    eraser: false,
+                    frame: false,
+                    embeddable: false,
+                    laser: false,
+                  },
                   canvasActions: {
                     changeViewBackgroundColor: false,
                     clearCanvas: false,
@@ -169,13 +188,13 @@ export function App() {
           <section className="transport-panel">
             <div className="transport-top"><span>EXECUTION TRACE</span><small>{step + 1} / {frames.length} events</small></div>
             <div className="transport-track"><div className="track-line"><i style={{ width: `${(step / Math.max(1, frames.length - 1)) * 100}%` }} /></div>{frames.map((candidate, index) => <button key={candidate.event.id} className={index <= step ? "done" : ""} onClick={() => changeStep(index)} aria-label={`Go to event ${index + 1}`} />)}</div>
-            <div className="transport-controls"><button onClick={() => changeStep(step - 1)} aria-label="Previous event">←</button><button className="play-button" onClick={() => { if (step < frames.length - 1) changeStep(step + 1); }} disabled={step === frames.length - 1 && !tarjanPackage.capabilities.rerun} aria-label={step === frames.length - 1 ? "Trace complete" : "Next event"}>{step === frames.length - 1 ? "✓" : "▶"}</button><button onClick={() => changeStep(step + 1)} aria-label="Next event">→</button><span className="key-hint"><kbd>←</kbd><kbd>→</kbd> STEP</span></div>
+            <div className="transport-controls"><button onClick={() => changeStep(step - 1)} aria-label="Previous event">←</button><button className="play-button" onClick={() => { if (step < frames.length - 1) changeStep(step + 1); }} disabled={step === frames.length - 1 && !capabilities.rerun} aria-label={step === frames.length - 1 ? "Trace complete" : "Next event"}>{step === frames.length - 1 ? "✓" : "▶"}</button><button onClick={() => changeStep(step + 1)} aria-label="Next event">→</button><span className="key-hint"><kbd>←</kbd><kbd>→</kbd> STEP</span></div>
           </section>
         </main>
 
-        {(!tarjanPackage.capabilities.toggleView || inspectorVisible) && <aside className="secondary-sidebar">
+        {(!capabilities.toggleView || inspectorVisible) && <aside className="secondary-sidebar">
           <div className="panel-tabs">{panelIds.map((id) => <button key={id} className={panel === id ? "active" : ""} onClick={() => setPanel(id)}>{panelLabel(id)}</button>)}</div>
-          <div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "call-stack" ? `${frame.state.stack.length} frames` : panel === "concepts" ? "3 concepts" : `${frames.length} events`}</small></div>
+          <div className="panel-heading"><span>{panelLabel(panel).toUpperCase()}</span><small>{panel === "variables" ? "live" : panel === "call-stack" ? `${frame.state.stack.length} frames` : panel === "concepts" ? "4 concepts" : `${frames.length} events`}</small></div>
           <div className="panel-body">{panel === "variables" ? <VariablesPanel frame={frame} /> : panel === "call-stack" ? <CallStackPanel frame={frame} /> : panel === "concepts" ? <ConceptsPanel frame={frame} /> : <TimelinePanel frameIndex={frame.index} onSelect={changeStep} />}</div>
           <div className="watch-panel"><div className="panel-heading"><span>WATCH</span><small>semantic</small></div><div className="watch-row"><span>current</span><b>{frame.state.current == null ? "—" : frame.state.labels[frame.state.current]}</b></div><div className="watch-row"><span>components</span><b>{componentSummary}</b></div><div className="watch-row"><span>phase</span><b>{frame.state.phase}</b></div></div>
         </aside>}

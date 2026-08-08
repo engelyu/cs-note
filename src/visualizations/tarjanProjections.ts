@@ -72,28 +72,39 @@ export function projectTarjanConcepts(frame: TarjanFrame): TarjanConcept[] {
   const { state } = frame;
   const currentLabel = state.current == null ? null : state.labels[state.current];
   const currentLow = state.current == null ? null : state.low[state.current];
+  const eventConceptFocus = frame.event.focus?.kind === "concept" ? frame.event.focus.id : null;
+  const componentSummary = state.components.length > 0
+    ? state.components.map((component) => `{${component.map((member) => state.labels[member]).join(", ")}}`).join(" · ")
+    : "none yet";
 
   return [
     {
       id: "onStack",
       label: "onStack",
       detail: state.stack.length > 0 ? `${state.stack.length} vertices retained` : "empty",
-      active: state.phase === "visit" || state.phase === "back-edge" || state.phase === "wait",
+      active: eventConceptFocus === "onStack" || state.phase === "visit" || state.phase === "back-edge" || state.phase === "wait",
       focus: { kind: "concept", id: "onStack" },
     },
     {
       id: "low-link",
       label: "low-link",
       detail: currentLabel == null ? "waiting for a vertex" : `low[${currentLabel}] = ${currentLow}`,
-      active: state.phase === "back-edge" || state.phase === "return",
+      active: eventConceptFocus === "low-link" || state.phase === "back-edge" || state.phase === "return",
       focus: { kind: "concept", id: "low-link" },
     },
     {
       id: "scc-root",
       label: "SCC root",
-      detail: state.components.length > 0 ? `${state.components.length} component found` : "not closed yet",
-      active: state.phase === "root" || state.phase === "pop-scc",
+      detail: state.components.length > 0 ? `${state.components.length} components: ${componentSummary}` : "not closed yet",
+      active: eventConceptFocus === "scc-root" || state.phase === "root" || state.phase === "pop-scc",
       focus: { kind: "concept", id: "scc-root" },
+    },
+    {
+      id: "scc",
+      label: "SCC result",
+      detail: componentSummary,
+      active: eventConceptFocus === "scc" || state.phase === "pop-scc" || state.phase === "done",
+      focus: { kind: "concept", id: "scc" },
     },
   ];
 }

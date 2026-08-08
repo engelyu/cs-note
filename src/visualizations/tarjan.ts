@@ -1,8 +1,4 @@
-import type {
-  ExecutionFrame,
-  ExecutionEvent,
-  VisualizationPackage,
-} from "../core/types";
+import type { ExecutionFrame, ExecutionEvent } from "../core/types";
 import type { GraphEdge, TarjanState } from "./tarjanModel";
 
 export type { GraphEdge, TarjanState } from "./tarjanModel";
@@ -59,7 +55,7 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
       phase,
       label,
       detail,
-      focus,
+      ...(focus ? { focus } : {}),
     };
     frames.push({
       index: frames.length,
@@ -196,31 +192,3 @@ export function createTarjanFrames(): ExecutionFrame<TarjanState>[] {
   );
   return frames;
 }
-
-export const tarjanAuthoringPackage: VisualizationPackage<TarjanState> = {
-  id: "tarjan-scc",
-  title: "Tarjan's Strongly Connected Components",
-  category: "Algorithms",
-  schemaVersion: 1,
-  views: [
-    { id: "graph", label: "Graph", kind: "canvas" },
-    { id: "variables", label: "Variables", kind: "panel" },
-    { id: "call-stack", label: "Call Stack", kind: "panel" },
-    { id: "concepts", label: "Concepts", kind: "panel" },
-    { id: "timeline", label: "Timeline", kind: "panel" },
-  ],
-  scenarios: [
-    {
-      id: "simple-cycle",
-      title: "The simplest cycle",
-      description: "A compact graph that exposes tree edges, a back edge, and three SCCs.",
-      frames: createTarjanFrames(),
-    },
-  ],
-  capabilities: {
-    toggleView: true,
-    editLayout: true,
-    editInput: false,
-    rerun: false,
-  },
-};

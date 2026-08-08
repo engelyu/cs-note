@@ -29,6 +29,12 @@ export type VisualizationScenario<State> = {
   title: string;
   description: string;
   frames: ExecutionFrame<State>[];
+  capabilities: {
+    toggleView: boolean;
+    editLayout: boolean;
+    editInput: boolean;
+    rerun: boolean;
+  };
 };
 
 export type VisualizationPackage<State> = {
@@ -38,12 +44,6 @@ export type VisualizationPackage<State> = {
   schemaVersion: 1;
   views: ViewSpec[];
   scenarios: VisualizationScenario<State>[];
-  capabilities: {
-    toggleView: boolean;
-    editLayout: boolean;
-    editInput: boolean;
-    rerun: boolean;
-  };
 };
 
 export type LayoutRect = { x: number; y: number; width: number; height: number };
