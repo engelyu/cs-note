@@ -1,5 +1,7 @@
 node_modules/
 dist/
 .worktrees/
+.cache/code-oss/
+dist/code-oss-web/
 *.tsbuildinfo
 .DS_Store
