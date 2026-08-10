@@ -1,7 +1,9 @@
 {
-  "artifactVersion": 1,
+  "schemaVersion": 1,
   "packageId": "tarjan-scc",
   "scenarioId": "simple-cycle",
-  "source": "tarjan.ts",
+  "title": "Tarjan's Strongly Connected Components",
+  "artifact": "src/visualizations/tarjanArtifact.json",
+  "source": "src/visualizations/tarjan.ts",
   "readOnly": true
 }

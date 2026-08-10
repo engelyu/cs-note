@@ -20,6 +20,16 @@ const TEXT_ASSET_EXTENSIONS = new Set([
   ".webmanifest",
   ".xml",
 ]);
+const REQUIRED_FILES = [
+  "index.html",
+  "out/vs/workbench/workbench.web.main.js",
+  "extensions/algor-note/package.json",
+  "extensions/algor-note/dist/extension.js",
+  "extensions/algor-note/dist/webview/assets/main.js",
+  "extensions/algor-note/resources/workspace/tarjan.algor.json",
+  "extensions/algor-note/resources/workspace/tarjan.ts",
+];
+const REQUIRED_DIRECTORIES = ["out", "resources", "extensions/algor-note"];
 
 function runCommand(command, args, cwd) {
   return new Promise((resolve, reject) => {
@@ -88,18 +98,24 @@ function verifyProjectUrls(content, file, base) {
   }
 }
 
-export async function verifyStaticOutput(outputDirectory, base) {
-  const requiredFiles = ["index.html"];
-  const requiredDirectories = ["out", "resources", "extensions/algor-note"];
-  for (const relative of requiredFiles) {
+export async function verifyStaticOutput(outputDirectory, base, root = process.cwd()) {
+  for (const relative of REQUIRED_DIRECTORIES) {
+    const value = path.join(outputDirectory, relative);
+    if (!(await exists(value))) throw new Error(`Static Code-OSS output is missing required artifact: ${relative}`);
+    if (!(await stat(value)).isDirectory()) throw new Error(`Static Code-OSS output requires a directory artifact: ${relative}`);
+  }
+  for (const relative of REQUIRED_FILES) {
     const value = path.join(outputDirectory, relative);
     if (!(await exists(value))) throw new Error(`Static Code-OSS output is missing required artifact: ${relative}`);
     if (!(await stat(value)).isFile()) throw new Error(`Static Code-OSS output requires a file artifact: ${relative}`);
   }
-  for (const relative of requiredDirectories) {
-    const value = path.join(outputDirectory, relative);
-    if (!(await exists(value))) throw new Error(`Static Code-OSS output is missing required artifact: ${relative}`);
-    if (!(await stat(value)).isDirectory()) throw new Error(`Static Code-OSS output requires a directory artifact: ${relative}`);
+  const source = await readFile(path.join(root, "src/visualizations/tarjan.ts"));
+  const copiedSource = await readFile(path.join(
+    outputDirectory,
+    "extensions/algor-note/resources/workspace/tarjan.ts",
+  ));
+  if (Buffer.compare(source, copiedSource) !== 0) {
+    throw new Error("Static Code-OSS output contains a stale Tarjan workspace source copy");
   }
   const files = await collectFiles(outputDirectory);
   let totalBytes = 0;
@@ -115,12 +131,7 @@ export async function verifyStaticOutput(outputDirectory, base) {
   }
 }
 
-export async function buildCodeOss(config, { fetch = fetchCodeOss, run = runCommand, root = process.cwd() } = {}) {
-  await fetch(config);
-  await run("npm", ["ci"], config.cacheDirectory);
-  await run("npm", ["run", "gulp", "compile-build"], config.cacheDirectory);
-  await run("npm", ["run", "gulp", "minify-vscode-reh-web"], config.cacheDirectory);
-
+async function assembleCodeOss(config, root) {
   const minifiedDirectory = path.join(config.cacheDirectory, "out-vscode-reh-web-min");
   const template = await readFile(
     path.join(minifiedDirectory, "vs", "code", "browser", "workbench", "workbench.html"),
@@ -138,8 +149,18 @@ export async function buildCodeOss(config, { fetch = fetchCodeOss, run = runComm
   await copyRequired(path.join(root, "extensions/algor-note"), path.join(config.outputDirectory, "extensions/algor-note"));
 }
 
+export async function buildCodeOss(config, { fetch = fetchCodeOss, run = runCommand, root = process.cwd() } = {}) {
+  await fetch(config);
+  await run("npm", ["ci"], config.cacheDirectory);
+  await run("npm", ["run", "gulp", "compile-build"], config.cacheDirectory);
+  await run("npm", ["run", "gulp", "minify-vscode-reh-web"], config.cacheDirectory);
+  await run("npm", ["run", "build:code-oss-extension"], root);
+  await run("npm", ["run", "build:code-oss-webview"], root);
+  await assembleCodeOss(config, root);
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const config = await loadCodeOssConfig(process.cwd());
-  if (process.argv[2] === "--verify") await verifyStaticOutput(config.outputDirectory, config.pagesBase);
+  if (process.argv[2] === "--verify") await verifyStaticOutput(config.outputDirectory, config.pagesBase, process.cwd());
   else await buildCodeOss(config);
 }

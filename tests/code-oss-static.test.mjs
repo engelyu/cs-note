@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm, stat, truncate, writeFile } from "node:fs/promises";
+import { access, mkdtemp, mkdir, readFile, rm, stat, truncate, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -14,8 +14,68 @@ async function makeStaticOutput(t, index = "") {
   await mkdir(path.join(output, "resources"), { recursive: true });
   await mkdir(path.join(output, "extensions", "algor-note"), { recursive: true });
   await writeFile(path.join(output, "index.html"), index);
+  await mkdir(path.join(output, "out", "vs", "workbench"), { recursive: true });
+  await writeFile(path.join(output, "out", "vs", "workbench", "workbench.web.main.js"), "workbench");
+  await mkdir(path.join(output, "extensions", "algor-note", "dist", "webview", "assets"), { recursive: true });
+  await mkdir(path.join(output, "extensions", "algor-note", "resources", "workspace"), { recursive: true });
+  await writeFile(path.join(output, "extensions", "algor-note", "package.json"), "{}");
+  await writeFile(path.join(output, "extensions", "algor-note", "dist", "extension.js"), "extension");
+  await writeFile(path.join(output, "extensions", "algor-note", "dist", "webview", "assets", "main.js"), "webview");
+  await writeFile(path.join(output, "extensions", "algor-note", "resources", "workspace", "tarjan.algor.json"), "{}");
+  await writeFile(
+    path.join(output, "extensions", "algor-note", "resources", "workspace", "tarjan.ts"),
+    await readFile(path.resolve("src/visualizations/tarjan.ts")),
+  );
   return output;
 }
+
+function collectLocalUrls(content) {
+  const urls = [];
+  const attributeUrls = /\b(?:src|href|action|poster|manifest|data-src|data-href)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
+  for (const match of content.matchAll(attributeUrls)) {
+    const value = match.slice(1).find(Boolean);
+    if (value?.startsWith("/")) urls.push(value);
+  }
+  return urls;
+}
+
+test("assembled Code-OSS output contains the workbench, extension, workspace, and local assets", async () => {
+  const outputRoot = path.resolve("dist/code-oss-web");
+  for (const relativePath of [
+    "index.html",
+    "out/vs/workbench/workbench.web.main.js",
+    "extensions/algor-note/package.json",
+    "extensions/algor-note/dist/extension.js",
+    "extensions/algor-note/dist/webview/assets/main.js",
+    "extensions/algor-note/resources/workspace/tarjan.algor.json",
+  ]) {
+    await access(path.join(outputRoot, relativePath));
+  }
+  assert.equal((await stat(path.join(outputRoot, "resources"))).isDirectory(), true);
+  assert.deepEqual(JSON.parse(await readFile(
+    path.join(outputRoot, "extensions/algor-note/resources/workspace/tarjan.algor.json"),
+    "utf8",
+  )), {
+    schemaVersion: 1,
+    packageId: "tarjan-scc",
+    scenarioId: "simple-cycle",
+    title: "Tarjan's Strongly Connected Components",
+    artifact: "src/visualizations/tarjanArtifact.json",
+    source: "src/visualizations/tarjan.ts",
+    readOnly: true,
+  });
+  assert.equal(
+    Buffer.compare(
+      await readFile(path.join(outputRoot, "extensions/algor-note/resources/workspace/tarjan.ts")),
+      await readFile(path.resolve("src/visualizations/tarjan.ts")),
+    ),
+    0,
+  );
+  for (const url of collectLocalUrls(await readFile(path.join(outputRoot, "index.html"), "utf8"))) {
+    assert.ok(url.startsWith("/cs-note/"));
+    await access(path.join(outputRoot, url.slice("/cs-note/".length)));
+  }
+});
 
 test("workbench rendering embeds only project-subpath static URIs", () => {
   const html = renderWorkbench({
@@ -170,7 +230,8 @@ test("Code-OSS fetch replaces a stale origin in an existing cache", async (t) =>
 
 test("static verification accepts project-subpath HTML and JavaScript URLs", async (t) => {
   const output = await makeStaticOutput(t, '<script src="/cs-note/out/main.js"></script>');
-  await writeFile(path.join(output, "main.js"), 'const worker = "/cs-note/out/worker.js";');
+  await writeFile(path.join(output, "out", "main.js"), 'const worker = "/cs-note/out/worker.js";');
+  await writeFile(path.join(output, "out", "worker.js"), "worker");
 
   await verifyStaticOutput(output, "/cs-note/");
 });
@@ -243,12 +304,23 @@ test("Code-OSS build assembles the verified workbench and extension", async (t) 
   const minified = path.join(cache, "out-vscode-reh-web-min");
   await mkdir(path.join(cache, "resources"), { recursive: true });
   await mkdir(path.join(minified, "vs", "code", "browser", "workbench"), { recursive: true });
+  await mkdir(path.join(minified, "vs", "workbench"), { recursive: true });
   await mkdir(path.join(root, "extensions", "algor-note"), { recursive: true });
+  await mkdir(path.join(root, "extensions", "algor-note", "dist", "webview", "assets"), { recursive: true });
+  await mkdir(path.join(root, "extensions", "algor-note", "resources", "workspace"), { recursive: true });
   await writeFile(path.join(cache, "resources", "marker.txt"), "resources");
   await writeFile(path.join(minified, "vs", "code", "browser", "workbench", "workbench.html"),
     '<main data-settings="{{WORKBENCH_WEB_CONFIGURATION}}">{{WORKBENCH_MAIN}}</main>');
+  await writeFile(path.join(minified, "vs", "workbench", "workbench.web.main.js"), "workbench");
   await writeFile(path.join(minified, "main.js"), "out");
   await writeFile(path.join(root, "extensions", "algor-note", "package.json"), '{"name":"algor-note"}');
+  await writeFile(path.join(root, "extensions", "algor-note", "dist", "extension.js"), "extension");
+  await writeFile(path.join(root, "extensions", "algor-note", "dist", "webview", "assets", "main.js"), "webview");
+  await writeFile(path.join(root, "extensions", "algor-note", "resources", "workspace", "tarjan.algor.json"), "{}");
+  await writeFile(
+    path.join(root, "extensions", "algor-note", "resources", "workspace", "tarjan.ts"),
+    await readFile(path.resolve("src/visualizations/tarjan.ts")),
+  );
   const config = {
     repository: "https://github.com/microsoft/vscode.git",
     commit: "6928394f91b684055b873eecb8bc281365131f1c",
@@ -270,6 +342,8 @@ test("Code-OSS build assembles the verified workbench and extension", async (t) 
     { command: "npm", args: ["ci"], cwd: cache },
     { command: "npm", args: ["run", "gulp", "compile-build"], cwd: cache },
     { command: "npm", args: ["run", "gulp", "minify-vscode-reh-web"], cwd: cache },
+    { command: "npm", args: ["run", "build:code-oss-extension"], cwd: root },
+    { command: "npm", args: ["run", "build:code-oss-webview"], cwd: root },
   ]);
   assert.equal(await readFile(path.join(output, "resources", "marker.txt"), "utf8"), "resources");
   assert.equal(await readFile(path.join(output, "out", "main.js"), "utf8"), "out");
