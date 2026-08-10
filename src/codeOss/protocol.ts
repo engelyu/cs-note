@@ -28,10 +28,21 @@ function hasExactKeys(value: Record<string, unknown>, keys: string[]): boolean {
     && keys.every((key) => Object.prototype.hasOwnProperty.call(value, key));
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
 function isLayoutRect(value: unknown): value is LayoutRect {
   return isRecord(value)
     && hasExactKeys(value, ["x", "y", "width", "height"])
-    && [value.x, value.y, value.width, value.height].every((entry) => typeof entry === "number" && Number.isFinite(entry))
+    && isFiniteNumber(value.x)
+    && isFiniteNumber(value.y)
+    && isFiniteNumber(value.width)
+    && isFiniteNumber(value.height)
     && value.width > 0 && value.height > 0;
 }
 
@@ -57,8 +68,7 @@ export function isHostToWebviewMessage(value: unknown): value is HostToWebviewMe
     && hasExactKeys(value, ["version", "type", "packageId", "scenarioId", "replayIndex", "layout", "selectedIds"])
     && value.packageId === "tarjan-scc"
     && value.scenarioId === "simple-cycle"
-    && Number.isInteger(value.replayIndex)
-    && value.replayIndex >= 0
+    && isNonNegativeInteger(value.replayIndex)
     && (value.layout === null || isLayout(value.layout))
     && Array.isArray(value.selectedIds)
     && value.selectedIds.every((id) => typeof id === "string");
@@ -69,8 +79,7 @@ export function isWebviewToHostMessage(value: unknown): value is WebviewToHostMe
   if (value.type === "ready") return hasExactKeys(value, ["version", "type"]);
   if (value.type === "replay-changed") {
     return hasExactKeys(value, ["version", "type", "replayIndex"])
-      && Number.isInteger(value.replayIndex)
-      && value.replayIndex >= 0;
+      && isNonNegativeInteger(value.replayIndex);
   }
   if (value.type === "layout-changed") {
     return hasExactKeys(value, ["version", "type", "layout"]) && isLayout(value.layout);
