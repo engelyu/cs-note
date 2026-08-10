@@ -154,3 +154,33 @@ test("message guards reject non-plain record objects", () => {
   assert.equal(isHostToWebviewMessage(dateMessage), false);
   assert.equal(isWebviewToHostMessage(mapMessage), false);
 });
+
+test("message guards reject enumerable Object.prototype layout entries", () => {
+  const pollutedLayoutKey = "__algor_note_protocol_layout_pollution__";
+  const originalDescriptor = Object.getOwnPropertyDescriptor(Object.prototype, pollutedLayoutKey);
+  const nullPrototypeLayout = Object.assign(Object.create(null), {
+    "node:A": validLayout["node:A"],
+  });
+
+  try {
+    Object.defineProperty(Object.prototype, pollutedLayoutKey, {
+      value: validLayout["node:B"],
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
+
+    assert.equal(isHostToWebviewMessage({ ...validOpenPackage, layout: nullPrototypeLayout }), true);
+    assert.equal(isWebviewToHostMessage({ version: 1, type: "layout-changed", layout: nullPrototypeLayout }), true);
+    assert.equal(isHostToWebviewMessage({ ...validOpenPackage, layout: {} }), false);
+    assert.equal(isWebviewToHostMessage({ version: 1, type: "layout-changed", layout: {} }), false);
+  } finally {
+    if (originalDescriptor === undefined) {
+      delete Object.prototype[pollutedLayoutKey];
+    } else {
+      Object.defineProperty(Object.prototype, pollutedLayoutKey, originalDescriptor);
+    }
+  }
+
+  assert.deepEqual(Object.getOwnPropertyDescriptor(Object.prototype, pollutedLayoutKey), originalDescriptor);
+});

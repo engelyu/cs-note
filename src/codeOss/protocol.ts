@@ -35,8 +35,17 @@ function isLayoutRect(value: unknown): value is LayoutRect {
     && value.width > 0 && value.height > 0;
 }
 
+function hasOnlyOwnEnumerableKeys(value: Record<string, unknown>): boolean {
+  for (const key in value) {
+    if (!Object.prototype.hasOwnProperty.call(value, key)) return false;
+  }
+  return true;
+}
+
 function isLayout(value: unknown): value is Record<string, LayoutRect> {
-  return isRecord(value) && Reflect.ownKeys(value).every((key) => typeof key === "string" && isLayoutRect(value[key]));
+  return isRecord(value)
+    && hasOnlyOwnEnumerableKeys(value)
+    && Reflect.ownKeys(value).every((key) => typeof key === "string" && isLayoutRect(value[key]));
 }
 
 export function isHostToWebviewMessage(value: unknown): value is HostToWebviewMessage {
