@@ -4,9 +4,11 @@ import { access } from "node:fs/promises";
 import { createRequire } from "node:module";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { createContext, Script, runInContext } from "node:vm";
 
 const require = createRequire(import.meta.url);
 const extensionBundle = new URL("../extensions/algor-note/dist/extension.js", import.meta.url);
+const webviewBundle = new URL("../extensions/algor-note/dist/webview/assets/main.js", import.meta.url);
 
 function loadExtensionBundle() {
   const records = { fileSystems: [], editors: [], commands: [], executedCommands: [] };
@@ -212,4 +214,231 @@ test("generated extension hosts CSP-safe HTML, static files, and no-permission m
   const command = records.commands.find((candidate) => candidate.command === "algorNote.openTarjan");
   await command.handler();
   assert.deepEqual(records.executedCommands.at(-1), ["vscode.openWith", new vscode.Uri("/workspace/tarjan.algor.json"), "algorNote.visualization"]);
+});
+
+test("generated webview recovers when the artifact-dependent editor module fails to load", async () => {
+  const source = await readFile(webviewBundle, "utf8");
+  const executableSource = source
+    .replaceAll("import.meta.url", "undefined")
+    .replace(/;export\{[\s\S]*$/, ";")
+    .replace(/await import\(`\.\/TarjanEditor-[^`]+`\)/, "await Promise.reject(new Error(\"artifact validation failed\"))");
+  const posts = [];
+  let receiveMessage;
+  const rootElement = {
+    textContent: "",
+    replaceChildren(...children) {
+      this.children = children;
+      this.textContent = children.map((child) => child.textContent).join("");
+    },
+  };
+  const document = {
+    getElementById(id) {
+      assert.equal(id, "root");
+      return rootElement;
+    },
+    querySelectorAll() {
+      return [];
+    },
+    createElement(tagName) {
+      return {
+        tagName,
+        className: "",
+        textContent: "",
+        relList: { supports: () => false },
+        setAttribute(name, value) {
+          this[name] = value;
+        },
+      };
+    },
+  };
+  const context = {
+    console,
+    require: (request) => {
+      if (request === "react") return {
+        version: "19.2.8",
+        __CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE: { S: null },
+      };
+      throw new Error(`Unexpected browser bundle require: ${request}`);
+    },
+    document,
+    window: {
+      addEventListener(type, handler) {
+        assert.equal(type, "message");
+        receiveMessage = handler;
+      },
+      dispatchEvent() {
+        return false;
+      },
+    },
+    acquireVsCodeApi() {
+      return { postMessage: (message) => posts.push(JSON.parse(JSON.stringify(message))) };
+    },
+    setTimeout,
+    clearTimeout,
+    Event: class {
+      constructor() {
+        this.defaultPrevented = false;
+      }
+    },
+    MutationObserver: class {
+      observe() {}
+    },
+  };
+  const script = new Script(executableSource, {
+    filename: fileURLToPath(webviewBundle),
+    importModuleDynamically: async () => {
+      throw new Error("artifact validation failed");
+    },
+  });
+  let bootError;
+  const vmContext = createContext(context);
+  try {
+    script.runInContext(vmContext);
+  } catch (error) {
+    bootError = error;
+  }
+  assert.equal(bootError, undefined, bootError?.message);
+  assert.deepEqual(posts, [{ version: 1, type: "ready" }]);
+  assert.ok(receiveMessage);
+  assert.match(rootElement.textContent, /Loading the verified Tarjan artifact/);
+
+  let messageError;
+  try {
+    const openPackage = JSON.stringify({
+      version: 1,
+      type: "open-package",
+      packageId: "tarjan-scc",
+      scenarioId: "simple-cycle",
+      replayIndex: 0,
+      layout: null,
+      selectedIds: [],
+    });
+    receiveMessage(runInContext(`({ data: JSON.parse(${JSON.stringify(openPackage)}) })`, vmContext));
+    await new Promise((resolve) => setImmediate(resolve));
+    await new Promise((resolve) => setImmediate(resolve));
+  } catch (error) {
+    messageError = error;
+  }
+  assert.equal(messageError, undefined, messageError?.message);
+  assert.match(rootElement.textContent, /Tarjan visualization unavailable/);
+  assert.match(rootElement.textContent, /artifact validation failed/);
+  assert.deepEqual(posts, [
+    { version: 1, type: "ready" },
+    { version: 1, type: "webview-error", message: "artifact validation failed" },
+  ]);
+});
+
+test("generated extension normalizes partial and stale persisted layout on reopen", async () => {
+  const { extension, records, vscode } = loadExtensionBundle();
+  const partialLayout = {
+    "node:A": { x: 999, y: 888, width: 72, height: 72 },
+    "node:stale": { x: 1, y: 2, width: 3, height: 4 },
+  };
+  const state = {
+    get(key, fallback) {
+      return key === "tarjan.layout" ? partialLayout : fallback;
+    },
+    async update() {},
+  };
+  const context = { extensionUri: new vscode.Uri("/extension"), workspaceState: state, subscriptions: [] };
+  extension.activate(context);
+  const editor = records.editors[0];
+  const posted = [];
+  let receiveMessage;
+  const panel = {
+    webview: {
+      cspSource: "https://algor-note.invalid",
+      options: undefined,
+      html: "",
+      asWebviewUri(uri) {
+        return `vscode-resource:${uri.path}`;
+      },
+      onDidReceiveMessage(handler) {
+        receiveMessage = handler;
+        return { dispose() {} };
+      },
+      postMessage(message) {
+        posted.push(message);
+        return Promise.resolve(true);
+      },
+    },
+  };
+  const document = await editor.provider.openCustomDocument(new vscode.Uri("/workspace/tarjan.algor.json"));
+  await editor.provider.resolveCustomEditor(document, panel);
+  receiveMessage({ version: 1, type: "ready" });
+  assert.deepEqual(posted, [{
+    version: 1,
+    type: "open-package",
+    packageId: "tarjan-scc",
+    scenarioId: "simple-cycle",
+    replayIndex: 0,
+    layout: {
+      "node:A": { x: 999, y: 888, width: 72, height: 72 },
+      "node:B": { x: 290, y: 90, width: 64, height: 64 },
+      "node:C": { x: 200, y: 250, width: 64, height: 64 },
+      "node:D": { x: 440, y: 90, width: 64, height: 64 },
+      "node:E": { x: 440, y: 250, width: 64, height: 64 },
+    },
+    selectedIds: [],
+  }]);
+});
+
+test("generated extension serializes rapid same-key memento writes and survives a failed write", async () => {
+  const { extension, records, vscode } = loadExtensionBundle();
+  const writes = [];
+  const state = {
+    get: (_key, fallback) => fallback,
+    update(key, value) {
+      let resolve;
+      let reject;
+      const promise = new Promise((resolvePromise, rejectPromise) => {
+        resolve = resolvePromise;
+        reject = rejectPromise;
+      });
+      writes.push({ key, value, promise, resolve, reject });
+      return promise;
+    },
+  };
+  const context = { extensionUri: new vscode.Uri("/extension"), workspaceState: state, subscriptions: [] };
+  extension.activate(context);
+  const editor = records.editors[0];
+  let receiveMessage;
+  const panel = {
+    webview: {
+      cspSource: "https://algor-note.invalid",
+      options: undefined,
+      html: "",
+      asWebviewUri(uri) {
+        return `vscode-resource:${uri.path}`;
+      },
+      onDidReceiveMessage(handler) {
+        receiveMessage = handler;
+        return { dispose() {} };
+      },
+      postMessage() {
+        return Promise.resolve(true);
+      },
+    },
+  };
+  const document = await editor.provider.openCustomDocument(new vscode.Uri("/workspace/tarjan.algor.json"));
+  await editor.provider.resolveCustomEditor(document, panel);
+  receiveMessage({ version: 1, type: "replay-changed", replayIndex: 1 });
+  receiveMessage({ version: 1, type: "replay-changed", replayIndex: 2 });
+  assert.deepEqual(writes.map(({ key, value }) => [key, value]), [["tarjan.replayIndex", 1]]);
+  const warnings = [];
+  const originalWarn = console.warn;
+  console.warn = (...args) => warnings.push(args);
+  try {
+    writes[0].reject(new Error("memento unavailable"));
+    await new Promise((resolve) => setImmediate(resolve));
+  } finally {
+    console.warn = originalWarn;
+  }
+  assert.equal(warnings.length, 1);
+  assert.deepEqual(writes.map(({ key, value }) => [key, value]), [
+    ["tarjan.replayIndex", 1],
+    ["tarjan.replayIndex", 2],
+  ]);
+  writes[1].resolve();
+  await new Promise((resolve) => setImmediate(resolve));
 });

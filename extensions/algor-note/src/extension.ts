@@ -4,6 +4,8 @@ import {
   isWebviewToHostMessage,
   type HostToWebviewMessage,
 } from "../../../src/codeOss/protocol";
+import type { LayoutRect } from "../../../src/core/types";
+import { TARJAN_LAYOUT } from "../../../src/visualizations/tarjanLayout";
 import { createWebviewHtml } from "./webviewHtml";
 import { ReadOnlyWorkspaceProvider } from "./virtualWorkspace";
 
@@ -21,8 +23,13 @@ function storedReplayIndex(state: vscode.Memento): number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : 0;
 }
 
-function storedLayout(state: vscode.Memento): Record<string, { x: number; y: number; width: number; height: number }> | null {
+function cloneLayout(layout: Record<string, LayoutRect>): Record<string, LayoutRect> {
+  return Object.fromEntries(Object.entries(layout).map(([id, rect]) => [id, { ...rect }]));
+}
+
+function storedLayout(state: vscode.Memento): Record<string, LayoutRect> | null {
   const value = state.get<unknown>(LAYOUT_KEY, null);
+  if (value === null) return null;
   const message = {
     version: 1 as const,
     type: "open-package" as const,
@@ -32,7 +39,11 @@ function storedLayout(state: vscode.Memento): Record<string, { x: number; y: num
     layout: value,
     selectedIds: [],
   };
-  return isHostToWebviewMessage(message) ? message.layout : null;
+  if (!isHostToWebviewMessage(message)) return cloneLayout(TARJAN_LAYOUT);
+  const persistedLayout = message.layout ?? {};
+  return Object.fromEntries(
+    Object.entries(TARJAN_LAYOUT).map(([id, rect]) => [id, { ...(persistedLayout[id] ?? rect) }]),
+  );
 }
 
 function storedSelectedIds(state: vscode.Memento): string[] {
@@ -41,17 +52,40 @@ function storedSelectedIds(state: vscode.Memento): string[] {
   return isWebviewToHostMessage(message) ? message.selectedIds : [];
 }
 
-function persist(state: vscode.Memento, key: string, value: unknown): void {
-  void Promise.resolve(state.update(key, value)).catch((error: unknown) => {
-    console.warn("Could not persist Algor Note state", error);
-  });
+class MementoWriteQueue {
+  private readonly tails = new Map<string, Promise<void>>();
+
+  constructor(private readonly state: vscode.Memento) {}
+
+  enqueue(key: string, value: unknown): void {
+    const previous = this.tails.get(key);
+    const write = previous
+      ? previous.then(() => this.update(key, value))
+      : this.update(key, value);
+    const settled = write.catch((error: unknown) => {
+      console.warn("Could not persist Algor Note state", error);
+    });
+    this.tails.set(key, settled);
+  }
+
+  private update(key: string, value: unknown): Promise<void> {
+    try {
+      return Promise.resolve(this.state.update(key, value));
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
 }
 
 export class AlgorNoteEditorProvider implements vscode.CustomReadonlyEditorProvider<AlgorNoteDocument> {
+  private readonly writes: MementoWriteQueue;
+
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly state: vscode.Memento,
-  ) {}
+  ) {
+    this.writes = new MementoWriteQueue(state);
+  }
 
   async openCustomDocument(uri: vscode.Uri): Promise<AlgorNoteDocument> {
     if (!uri.path.endsWith(".algor.json")) {
@@ -84,11 +118,11 @@ export class AlgorNoteEditorProvider implements vscode.CustomReadonlyEditorProvi
         };
         void panel.webview.postMessage(openPackage);
       } else if (message.type === "replay-changed") {
-        persist(this.state, REPLAY_INDEX_KEY, message.replayIndex);
+        this.writes.enqueue(REPLAY_INDEX_KEY, message.replayIndex);
       } else if (message.type === "layout-changed") {
-        persist(this.state, LAYOUT_KEY, message.layout);
+        this.writes.enqueue(LAYOUT_KEY, message.layout);
       } else if (message.type === "selection-changed") {
-        persist(this.state, SELECTED_IDS_KEY, message.selectedIds);
+        this.writes.enqueue(SELECTED_IDS_KEY, message.selectedIds);
       } else {
         console.error("Algor Note webview error", message.message);
         void panel.webview.postMessage({

@@ -22,6 +22,18 @@ const tarjanScenario = tarjanPackage.scenarios[0];
 const tarjanFrames = tarjanScenario.frames;
 type TarjanFrame = (typeof tarjanFrames)[number];
 
+export function normalizeTarjanLayout(value: unknown): Record<string, LayoutRect> {
+  const message = {
+    version: 1 as const,
+    type: "layout-changed" as const,
+    layout: value,
+  };
+  const persistedLayout = isWebviewToHostMessage(message) ? message.layout : {};
+  return Object.fromEntries(
+    Object.entries(TARJAN_LAYOUT).map(([id, rect]) => [id, { ...(persistedLayout[id] ?? rect) }]),
+  ) as Record<string, LayoutRect>;
+}
+
 const layoutOnlyTools = {
   selection: true,
   hand: true,
@@ -225,7 +237,7 @@ export function ErrorPanel({ message }: { message: string }): React.ReactElement
 
 export function TarjanEditor({ initialStep, initialLayout, initialSelectedIds, postMessage }: { initialStep: number; initialLayout: Record<string, LayoutRect> | null; initialSelectedIds: string[]; postMessage(message: WebviewToHostMessage): void }): React.ReactElement {
   const [step, setStep] = useState(() => Math.max(0, Math.min(tarjanFrames.length - 1, initialStep)));
-  const [layout, setLayout] = useState<Record<string, LayoutRect>>(() => structuredClone(initialLayout ?? TARJAN_LAYOUT));
+  const [layout, setLayout] = useState<Record<string, LayoutRect>>(() => normalizeTarjanLayout(initialLayout));
   const frame = tarjanFrames[step];
   const elements = useMemo(() => frame ? convertToStableExcalidrawElements(createTarjanSkeletons(frame.state, layout)) : [], [frame, layout]);
 
@@ -237,8 +249,9 @@ export function TarjanEditor({ initialStep, initialLayout, initialSelectedIds, p
     postMessage({ version: 1, type: "replay-changed", replayIndex });
   };
   const acceptLayout = (next: Record<string, LayoutRect>) => {
-    setLayout(next);
-    postMessage({ version: 1, type: "layout-changed", layout: next });
+    const normalized = normalizeTarjanLayout(next);
+    setLayout(normalized);
+    postMessage({ version: 1, type: "layout-changed", layout: normalized });
   };
 
   return (
