@@ -98,3 +98,59 @@ test("message guards reject layouts with malformed geometry", () => {
     assert.equal(isWebviewToHostMessage({ version: 1, type: "layout-changed", layout }), false);
   }
 });
+
+test("message guards reject prototype-inherited fields", () => {
+  const inheritedHostMessage = Object.assign(
+    Object.create({ message: "inherited error" }),
+    { version: 1, type: "host-error" },
+  );
+  const inheritedWebviewMessage = Object.assign(
+    Object.create({ type: "ready" }),
+    { version: 1 },
+  );
+
+  assert.equal(isHostToWebviewMessage(inheritedHostMessage), false);
+  assert.equal(isWebviewToHostMessage(inheritedWebviewMessage), false);
+});
+
+test("message guards reject inherited layout entries and geometry", () => {
+  const inheritedLayout = Object.create({ "node:B": validLayout["node:B"] });
+  const inheritedRect = Object.assign(
+    Object.create({ height: 84 }),
+    { x: 100, y: 120, width: 84 },
+  );
+
+  for (const layout of [inheritedLayout, { "node:A": inheritedRect }]) {
+    assert.equal(isHostToWebviewMessage({ ...validOpenPackage, layout }), false);
+    assert.equal(isWebviewToHostMessage({ version: 1, type: "layout-changed", layout }), false);
+  }
+});
+
+test("message guards reject extra keys on every protocol variant", () => {
+  const hostMessages = [
+    { ...validOpenPackage, extra: true },
+    { version: 1, type: "host-error", message: "Package unavailable", extra: true },
+  ];
+  const webviewMessages = [
+    { version: 1, type: "ready", extra: true },
+    { version: 1, type: "replay-changed", replayIndex: 1, extra: true },
+    { version: 1, type: "layout-changed", layout: validLayout, extra: true },
+    { version: 1, type: "selection-changed", selectedIds: [], extra: true },
+    { version: 1, type: "webview-error", message: "Canvas failed", extra: true },
+  ];
+
+  for (const message of hostMessages) assert.equal(isHostToWebviewMessage(message), false);
+  for (const message of webviewMessages) assert.equal(isWebviewToHostMessage(message), false);
+});
+
+test("message guards reject non-plain record objects", () => {
+  const dateMessage = Object.assign(new Date(0), {
+    version: 1,
+    type: "host-error",
+    message: "Date object",
+  });
+  const mapMessage = Object.assign(new Map(), { version: 1, type: "ready" });
+
+  assert.equal(isHostToWebviewMessage(dateMessage), false);
+  assert.equal(isWebviewToHostMessage(mapMessage), false);
+});
