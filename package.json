@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:code-oss-extension": "node extensions/algor-note/esbuild.mjs",
+    "build:code-oss-webview": "vite build -c vite.code-oss-webview.config.ts",
     "preview": "vite preview",
-    "test": "node scripts/verify-licenses.mjs && node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types scripts/verify-lis-artifact.mjs && node --experimental-strip-types --test tests/observation.test.mjs tests/tarjan.test.mjs tests/lis.test.mjs tests/algorithm-visualizer.test.mjs tests/workbenchState.test.mjs && node --test tests/code-oss-config.test.mjs tests/code-oss-static.test.mjs",
+    "test": "node scripts/verify-licenses.mjs && node --experimental-strip-types scripts/verify-tarjan-artifact.mjs && node --experimental-strip-types scripts/verify-lis-artifact.mjs && node --experimental-strip-types --test tests/observation.test.mjs tests/tarjan.test.mjs tests/lis.test.mjs tests/algorithm-visualizer.test.mjs tests/workbenchState.test.mjs && node --test tests/code-oss-config.test.mjs tests/code-oss-static.test.mjs && node --experimental-strip-types --test tests/code-oss-protocol.test.mjs",
     "fetch:code-oss": "node scripts/code-oss/fetch.mjs",
     "build:code-oss": "node scripts/code-oss/build.mjs",
     "verify:code-oss-static": "node scripts/code-oss/build.mjs --verify",
@@ -17,7 +19,8 @@
     "verify:lis": "node --experimental-strip-types scripts/verify-lis-artifact.mjs",
     "verify:licenses": "node scripts/verify-licenses.mjs",
     "patch:excalidraw-tools": "node scripts/patch-excalidraw-tools.mjs",
-    "vendor:excalidraw": "node scripts/vendor-excalidraw.mjs"
+    "vendor:excalidraw": "node scripts/vendor-excalidraw.mjs",
+    "verify:code-oss-extension": "npm run build:code-oss-extension && npm run build:code-oss-webview && node --test tests/code-oss-extension.test.mjs"
   },
   "dependencies": {
     "react": "19.2.8",
