@@ -1,0 +1,20 @@
+{
+  "name": "algor-note",
+  "displayName": "Algor Note",
+  "publisher": "engelyu",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.124.0" },
+  "browser": "./dist/extension.js",
+  "extensionKind": ["web"],
+  "capabilities": { "virtualWorkspaces": true, "untrustedWorkspaces": { "supported": true } },
+  "activationEvents": ["onFileSystem:algor-note-vfs", "onCustomEditor:algorNote.visualization", "onCommand:algorNote.openTarjan"],
+  "contributes": {
+    "commands": [{ "command": "algorNote.openTarjan", "title": "Algor Note: Open Tarjan" }],
+    "customEditors": [{
+      "viewType": "algorNote.visualization",
+      "displayName": "Algor Note Visualization",
+      "selector": [{ "filenamePattern": "*.algor.json" }],
+      "priority": "default"
+    }]
+  }
+}
