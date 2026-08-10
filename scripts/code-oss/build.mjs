@@ -7,6 +7,19 @@ import { fetchCodeOss } from "./fetch.mjs";
 import { renderWorkbench } from "./render-workbench.mjs";
 
 const MAX_OUTPUT_BYTES = 1_000_000_000;
+const TEXT_ASSET_EXTENSIONS = new Set([
+  ".cjs",
+  ".css",
+  ".html",
+  ".js",
+  ".json",
+  ".map",
+  ".mjs",
+  ".svg",
+  ".txt",
+  ".webmanifest",
+  ".xml",
+]);
 
 function runCommand(command, args, cwd) {
   return new Promise((resolve, reject) => {
@@ -57,24 +70,43 @@ async function collectFiles(directory) {
 }
 
 function verifyProjectUrls(content, file, base) {
-  const urls = content.matchAll(/["'`]((?:\/)(?!\/)[^"'`\s<>()]*)["'`]/g);
-  for (const match of urls) {
-    if (!match[1].startsWith(base)) {
-      throw new Error(`Generated URL in ${file} must begin with ${base}: ${match[1]}`);
+  const candidates = [];
+  const attributeUrls = /\b(?:src|href|action|poster|manifest|data-src|data-href)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
+  const cssUrls = /\burl\(\s*(?:"([^"]*)"|'([^']*)'|([^\s)]+))\s*\)/gi;
+  const quotedUrls = /["'`]((?:\/(?!\/)|\/\/|https?:\/\/|wss?:\/\/)[^"'`\s<>()]*)["'`]/gi;
+  const bareUrls = /(?:https?:\/\/|wss?:\/\/|\/\/[A-Za-z0-9.-]+(?:\/[^\s"'<>)]*)?)/g;
+  for (const pattern of [attributeUrls, cssUrls, quotedUrls, bareUrls]) {
+    for (const match of content.matchAll(pattern)) {
+      const value = match.slice(1).find(Boolean) ?? match[0];
+      if (/^(?:\/|https?:\/\/|wss?:\/\/)/.test(value)) candidates.push(value);
+    }
+  }
+  for (const value of candidates) {
+    if (!value.startsWith(base)) {
+      throw new Error(`Generated URL in ${file} must begin with ${base}: ${value}`);
     }
   }
 }
 
 export async function verifyStaticOutput(outputDirectory, base) {
-  if (!(await exists(path.join(outputDirectory, "index.html")))) {
-    throw new Error(`Static Code-OSS output is missing index.html: ${outputDirectory}`);
+  const requiredFiles = ["index.html"];
+  const requiredDirectories = ["out", "resources", "extensions/algor-note"];
+  for (const relative of requiredFiles) {
+    const value = path.join(outputDirectory, relative);
+    if (!(await exists(value))) throw new Error(`Static Code-OSS output is missing required artifact: ${relative}`);
+    if (!(await stat(value)).isFile()) throw new Error(`Static Code-OSS output requires a file artifact: ${relative}`);
+  }
+  for (const relative of requiredDirectories) {
+    const value = path.join(outputDirectory, relative);
+    if (!(await exists(value))) throw new Error(`Static Code-OSS output is missing required artifact: ${relative}`);
+    if (!(await stat(value)).isDirectory()) throw new Error(`Static Code-OSS output requires a directory artifact: ${relative}`);
   }
   const files = await collectFiles(outputDirectory);
   let totalBytes = 0;
   for (const file of files) {
     totalBytes += (await stat(file)).size;
     if (totalBytes >= MAX_OUTPUT_BYTES) throw new Error("Static Code-OSS output exceeds 1 GB");
-    if (!/[.](?:html|js|mjs|cjs)$/i.test(file)) continue;
+    if (!TEXT_ASSET_EXTENSIONS.has(path.extname(file).toLowerCase())) continue;
     const content = await readFile(file, "utf8");
     if (/remoteAuthority|ws:\/\/|wss:\/\//.test(content)) {
       throw new Error(`Static Code-OSS output contains a forbidden network marker: ${file}`);

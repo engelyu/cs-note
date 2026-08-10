@@ -34,12 +34,25 @@ async function exists(value) {
   }
 }
 
+async function ensureOrigin(config, run) {
+  const remotes = (await run("git", ["remote"], config.cacheDirectory)).trim().split(/\s+/).filter(Boolean);
+  if (!remotes.includes("origin")) {
+    await run("git", ["remote", "add", "origin", config.repository], config.cacheDirectory);
+    return;
+  }
+  const repository = (await run("git", ["remote", "get-url", "origin"], config.cacheDirectory)).trim();
+  if (repository !== config.repository) {
+    await run("git", ["remote", "remove", "origin"], config.cacheDirectory);
+    await run("git", ["remote", "add", "origin", config.repository], config.cacheDirectory);
+  }
+}
+
 export async function fetchCodeOss(config, run = runCommand) {
   await mkdir(config.cacheDirectory, { recursive: true });
   if (!(await exists(path.join(config.cacheDirectory, ".git")))) {
     await run("git", ["init"], config.cacheDirectory);
     await run("git", ["remote", "add", "origin", config.repository], config.cacheDirectory);
-  }
+  } else await ensureOrigin(config, run);
   await run("git", ["fetch", "--depth", "1", "origin", config.commit], config.cacheDirectory);
   await run("git", ["checkout", "--detach", "FETCH_HEAD"], config.cacheDirectory);
   const actual = (await run("git", ["rev-parse", "HEAD"], config.cacheDirectory)).trim();
