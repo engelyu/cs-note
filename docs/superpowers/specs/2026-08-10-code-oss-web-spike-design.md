@@ -1,6 +1,6 @@
 # Code-OSS Web Static Host Spike
 
-Status: Proposed for written review
+Status: Accepted
 
 ## Purpose
 
