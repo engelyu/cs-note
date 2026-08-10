@@ -152,7 +152,7 @@ async function assembleCodeOss(config, root) {
 export async function buildCodeOss(config, { fetch = fetchCodeOss, run = runCommand, root = process.cwd() } = {}) {
   await fetch(config);
   await run("npm", ["ci"], config.cacheDirectory);
-  await run("npm", ["run", "gulp", "compile-build"], config.cacheDirectory);
+  await run("npm", ["run", "compile-build"], config.cacheDirectory);
   await run("npm", ["run", "gulp", "minify-vscode-reh-web"], config.cacheDirectory);
   await run("npm", ["run", "build:code-oss-extension"], root);
   await run("npm", ["run", "build:code-oss-webview"], root);

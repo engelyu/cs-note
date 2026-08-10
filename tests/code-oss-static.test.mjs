@@ -340,7 +340,7 @@ test("Code-OSS build assembles the verified workbench and extension", async (t) 
   assert.equal(fetched, true);
   assert.deepEqual(commands, [
     { command: "npm", args: ["ci"], cwd: cache },
-    { command: "npm", args: ["run", "gulp", "compile-build"], cwd: cache },
+    { command: "npm", args: ["run", "compile-build"], cwd: cache },
     { command: "npm", args: ["run", "gulp", "minify-vscode-reh-web"], cwd: cache },
     { command: "npm", args: ["run", "build:code-oss-extension"], cwd: root },
     { command: "npm", args: ["run", "build:code-oss-webview"], cwd: root },
